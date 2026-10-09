@@ -1,63 +1,38 @@
 # Kora Music Player
 
-A music player and streaming web application built with Django.
+Kora is a Django web application for discovering African and global music. It provides server-rendered artist and track discovery, artist profiles, local account authentication, and a client-side player interface. Music catalogue data is obtained at request time from the Spotify23 API on RapidAPI; Kora does not stream audio or persist catalogue data.
 
-## Features
-- Audio player interface with playlists and track browsing
-- User authentication (login, signup, profile)
-- Search and library navigation
-- Responsive styling
+## Contents
 
-## Project Structure
-- `music/`: Django core project settings and routing
-- `music_app/`: Main Django app handling views and models
-- `templates/`: HTML templates for UI views
-- `static/`: CSS styles, branding assets, and favicons
+- [Architecture](docs/architecture.md)
+- [Configuration](docs/configuration.md)
+- [Development](docs/development.md)
+- [Operations and deployment](docs/operations.md)
+- [Security](docs/security.md)
 
-## Getting Started
+## Quick start
 
-### Prerequisites
-- Python 3.10+
-- Docker & Docker Compose (for local PostgreSQL)
+Prerequisites: Python 3.10 or later, Docker Compose, and a RapidAPI key for the `spotify23` API.
 
-### Local Setup
-1. Create and activate a virtual environment:
-   ```bash
-   python -m venv .venv
-   # Windows:
-   .venv\Scripts\activate
-   # macOS/Linux:
-   source .venv/bin/activate
-   ```
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+Copy-Item .env.example .env
+docker compose up -d
+python manage.py migrate
+python manage.py runserver
+```
 
-2. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
+Set `RAPIDAPI_KEY` in `.env` before using search, artist profiles, or the featured content on the home page. Visit `http://127.0.0.1:8000/`; `http://127.0.0.1:8000/health/` returns a JSON liveness response.
 
-3. Start local PostgreSQL via Docker:
-   ```bash
-   docker compose up -d
-   ```
+## Common commands
 
-4. Run database migrations:
-   ```bash
-   python manage.py migrate
-   ```
+```powershell
+python manage.py check
+python manage.py test
+python manage.py makemigrations --check --dry-run
+python manage.py collectstatic --noinput
+```
 
-5. Start the development server:
-   ```bash
-   python manage.py runserver
-   ```
-   Open [http://127.0.0.1:8000/](http://127.0.0.1:8000/) in your browser.
-
-## Free Deployment (Render + Neon)
-1. **Database:** Create a free serverless PostgreSQL database at [Neon.tech](https://neon.tech) and copy your connection string.
-2. **Web Service:** Create a new Web Service on [Render.com](https://render.com) connected to this GitHub repo.
-3. **Build & Start Commands:**
-   - **Build Command:** `./build.sh`
-   - **Start Command:** `gunicorn music.wsgi:application`
-4. **Environment Variables on Render:**
-   - `DATABASE_URL`: Your Neon Postgres connection string
-   - `DEBUG`: `False`
-   - `SECRET_KEY`: A secure random secret key
+For deployment requirements, environment variables, release procedure, and rollback guidance, see [Operations](docs/operations.md). Never commit `.env` or production credentials.
