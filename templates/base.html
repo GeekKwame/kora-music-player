@@ -63,9 +63,13 @@
     <!-- User Status -->
     <div class="sidebar-user-card">
       <div class="user-info-row">
-        <div class="user-avatar-badge" aria-hidden="true">
-          {% if request.user.is_authenticated %}{{ request.user.username|slice:":1"|upper }}{% else %}G{% endif %}
-        </div>
+        {% if request.user.is_authenticated and request.user.avatar_url %}
+          <img src="{{ request.user.avatar_url }}" alt="{{ request.user.username }}" class="user-avatar-img">
+        {% elif request.user.is_authenticated %}
+          <div class="user-avatar-badge" aria-hidden="true">{{ request.user.username|slice:":1"|upper }}</div>
+        {% else %}
+          <div class="user-avatar-badge" aria-hidden="true">G</div>
+        {% endif %}
         <div>
           <div class="user-greeting">Welcome</div>
           <div class="user-name">{% if request.user.is_authenticated %}{{ request.user.username }}{% else %}Guest Listener{% endif %}</div>
@@ -81,6 +85,17 @@
             </svg>
             Sign Out
           </a>
+          <label for="mobile-avatar-upload" class="user-logout-btn" style="cursor: pointer;" title="Change picture">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+              <circle cx="12" cy="13" r="4"></circle>
+            </svg>
+            Photo
+          </label>
+          <form id="mobile-avatar-form" action="{% url 'update_avatar' %}" method="post" enctype="multipart/form-data" style="display: none;">
+            {% csrf_token %}
+            <input type="file" id="mobile-avatar-upload" name="avatar" accept="image/*" onchange="document.getElementById('mobile-avatar-form').submit();">
+          </form>
         {% else %}
           <a href="{% url 'login' %}" class="user-auth-link">Sign In</a>
           <span style="color: var(--text-dim);">•</span>
@@ -141,34 +156,49 @@
         </a>
       </div>
 
-      <!-- User Status Card -->
-      <div class="sidebar-user-card">
-        <div class="user-info-row">
-          <div class="user-avatar-badge" aria-hidden="true">
-            {% if request.user.is_authenticated %}{{ request.user.username|slice:":1"|upper }}{% else %}G{% endif %}
+        <!-- User Status Card -->
+        <div class="sidebar-user-card">
+          <div class="user-info-row">
+            {% if request.user.is_authenticated and request.user.avatar_url %}
+              <img src="{{ request.user.avatar_url }}" alt="{{ request.user.username }}" class="user-avatar-img">
+            {% elif request.user.is_authenticated %}
+              <div class="user-avatar-badge" aria-hidden="true">{{ request.user.username|slice:":1"|upper }}</div>
+            {% else %}
+              <div class="user-avatar-badge" aria-hidden="true">G</div>
+            {% endif %}
+            <div>
+              <div class="user-greeting">Welcome</div>
+              <div class="user-name">{% if request.user.is_authenticated %}{{ request.user.username }}{% else %}Guest Listener{% endif %}</div>
+            </div>
           </div>
-          <div>
-            <div class="user-greeting">Welcome</div>
-            <div class="user-name">{% if request.user.is_authenticated %}{{ request.user.username }}{% else %}Guest Listener{% endif %}</div>
+          <div class="user-actions">
+            {% if request.user.is_authenticated %}
+              <a href="{% url 'logout' %}" class="user-logout-btn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                  <polyline points="16 17 21 12 16 7"></polyline>
+                  <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+                Sign Out
+              </a>
+              <label for="desktop-avatar-upload" class="user-logout-btn" style="cursor: pointer;" title="Change picture">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                  <circle cx="12" cy="13" r="4"></circle>
+                </svg>
+                Photo
+              </label>
+              <form id="desktop-avatar-form" action="{% url 'update_avatar' %}" method="post" enctype="multipart/form-data" style="display: none;">
+                {% csrf_token %}
+                <input type="file" id="desktop-avatar-upload" name="avatar" accept="image/*" onchange="document.getElementById('desktop-avatar-form').submit();">
+              </form>
+            {% else %}
+              <a href="{% url 'login' %}" class="user-auth-link">Sign In</a>
+              <span style="color: var(--text-dim);" aria-hidden="true">•</span>
+              <a href="{% url 'signup' %}" class="user-auth-link" style="color: var(--text-secondary);">Register</a>
+            {% endif %}
           </div>
         </div>
-        <div class="user-actions">
-          {% if request.user.is_authenticated %}
-            <a href="{% url 'logout' %}" class="user-logout-btn">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                <polyline points="16 17 21 12 16 7"></polyline>
-                <line x1="21" y1="12" x2="9" y2="12"></line>
-              </svg>
-              Sign Out
-            </a>
-          {% else %}
-            <a href="{% url 'login' %}" class="user-auth-link">Sign In</a>
-            <span style="color: var(--text-dim);" aria-hidden="true">•</span>
-            <a href="{% url 'signup' %}" class="user-auth-link" style="color: var(--text-secondary);">Register</a>
-          {% endif %}
-        </div>
-      </div>
 
       <!-- Navigation Links -->
       <div class="sidebar-nav-section">

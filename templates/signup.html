@@ -48,8 +48,52 @@
     {% endif %}
 
     <!-- Signup Form -->
-    <form action="{% url 'signup' %}" method="post" class="auth-form" novalidate>
+    <form action="{% url 'signup' %}" method="post" enctype="multipart/form-data" class="auth-form" novalidate>
       {% csrf_token %}
+
+      <!-- Profile Picture Selection -->
+      <div class="form-group">
+        <label class="form-label">Profile Picture (Optional)</label>
+        <div class="avatar-picker-section">
+          <div class="avatar-preview-container">
+            <div class="avatar-preview-circle">
+              <span class="avatar-preview-placeholder" id="avatar-placeholder">👤</span>
+              <img src="" alt="Avatar preview" class="avatar-preview-img" id="avatar-preview-img">
+            </div>
+            <div>
+              <label for="id_avatar" class="avatar-upload-btn-label">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="17 8 12 3 7 8"></polyline>
+                  <line x1="12" y1="3" x2="12" y2="15"></line>
+                </svg>
+                Upload Photo
+              </label>
+              <input type="file" id="id_avatar" name="avatar" accept="image/*" style="display: none;">
+              <input type="hidden" id="id_avatar_preset" name="avatar_preset" value="">
+              <p style="font-size: 11px; color: var(--text-dim); margin-top: 4px;">PNG, JPG, WebP up to 5MB</p>
+            </div>
+          </div>
+
+          <div style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">
+            Or select an avatar:
+          </div>
+          <div class="avatar-presets-grid" role="radiogroup" aria-label="Preset avatar choices">
+            <button type="button" class="avatar-preset-choice" data-preset="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80" aria-label="Afrobeat Gold preset">
+              <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80" alt="Preset 1">
+            </button>
+            <button type="button" class="avatar-preset-choice" data-preset="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&auto=format&fit=crop&q=80" aria-label="Amapiano Rhythm preset">
+              <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&auto=format&fit=crop&q=80" alt="Preset 2">
+            </button>
+            <button type="button" class="avatar-preset-choice" data-preset="https://images.unsplash.com/photo-1517841905240-472988babdf9?w=120&auto=format&fit=crop&q=80" aria-label="Sahel Soul preset">
+              <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?w=120&auto=format&fit=crop&q=80" alt="Preset 3">
+            </button>
+            <button type="button" class="avatar-preset-choice" data-preset="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=120&auto=format&fit=crop&q=80" aria-label="Lofi Chill preset">
+              <img src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=120&auto=format&fit=crop&q=80" alt="Preset 4">
+            </button>
+          </div>
+        </div>
+      </div>
 
       <div class="form-group">
         <label for="id_reg_username" class="form-label">Username</label>
@@ -112,6 +156,45 @@
         <a href="{% url 'login' %}" class="auth-footer-link">Sign in</a>
       </p>
     </form>
+
+    <script>
+      (function() {
+        const fileInput = document.getElementById('id_avatar');
+        const presetInput = document.getElementById('id_avatar_preset');
+        const previewImg = document.getElementById('avatar-preview-img');
+        const placeholder = document.getElementById('avatar-placeholder');
+        const presetBtns = document.querySelectorAll('.avatar-preset-choice');
+
+        if (fileInput) {
+          fileInput.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+              const reader = new FileReader();
+              reader.onload = function(e) {
+                previewImg.src = e.target.result;
+                previewImg.style.display = 'block';
+                if (placeholder) placeholder.style.display = 'none';
+                presetInput.value = '';
+                presetBtns.forEach(b => b.classList.remove('selected'));
+              };
+              reader.readAsDataURL(this.files[0]);
+            }
+          });
+        }
+
+        presetBtns.forEach(btn => {
+          btn.addEventListener('click', function() {
+            const url = this.getAttribute('data-preset');
+            presetInput.value = url;
+            previewImg.src = url;
+            previewImg.style.display = 'block';
+            if (placeholder) placeholder.style.display = 'none';
+            presetBtns.forEach(b => b.classList.remove('selected'));
+            this.classList.add('selected');
+            if (fileInput) fileInput.value = '';
+          });
+        });
+      })();
+    </script>
 
     <!-- Back to Home -->
     <a href="{% url 'home' %}" class="auth-back-home">

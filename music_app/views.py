@@ -77,11 +77,52 @@ def signup(request):
         else:
             user = User.objects.create_user(username=username, email=email, password=password)
             user.save()
+
+            # Handle profile picture option (file upload or chosen preset)
+            avatar_file = request.FILES.get('avatar')
+            avatar_preset = request.POST.get('avatar_preset', '').strip()
+
+            from .models import Profile
+            profile, _ = Profile.objects.get_or_create(user=user)
+            if avatar_file:
+                profile.avatar = avatar_file
+                profile.avatar_url = ''
+                profile.save()
+            elif avatar_preset:
+                profile.avatar_url = avatar_preset
+                profile.save()
+
+            user.refresh_from_db()
             auth_login(request, user)
             messages.success(request, f'Welcome to Kora, {username}!')
             return redirect('home')
 
     return render(request, 'signup.html')
+
+
+def update_avatar(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+
+    if request.method == 'POST':
+        avatar_file = request.FILES.get('avatar')
+        avatar_preset = request.POST.get('avatar_preset', '').strip()
+
+        from .models import Profile
+        profile, _ = Profile.objects.get_or_create(user=request.user)
+
+        if avatar_file:
+            profile.avatar = avatar_file
+            profile.avatar_url = ''
+            profile.save()
+            messages.success(request, 'Profile picture updated!')
+        elif avatar_preset:
+            profile.avatar_url = avatar_preset
+            profile.avatar = None
+            profile.save()
+            messages.success(request, 'Profile picture updated!')
+
+    return redirect(request.META.get('HTTP_REFERER', 'home'))
 
 
 def login(request):

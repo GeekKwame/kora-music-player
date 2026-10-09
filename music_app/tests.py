@@ -54,3 +54,44 @@ class KoraFrontendTests(TestCase):
         html = render_to_string('music.html', {'request': req})
         self.assertIn('Now Playing', html)
         self.assertIn('African Lofi Experience', html)
+
+    def test_signup_with_avatar_preset_and_populate_on_login(self):
+        # Signup with an avatar preset
+        preset_url = "https://images.unsplash.com/photo-test-preset.jpg"
+        response = self.client.post(reverse('signup'), {
+            'username': 'afrobeattester',
+            'email': 'tester@example.com',
+            'password': 'password123',
+            'repeat_password': 'password123',
+            'avatar_preset': preset_url
+        }, HTTP_HOST='127.0.0.1', follow=True)
+        self.assertEqual(response.status_code, 200)
+
+        # Check that user is logged in and avatar is populated in response
+        self.assertContains(response, 'afrobeattester')
+        self.assertContains(response, preset_url)
+
+        # Logout and log back in to verify avatar is populated anytime they sign in
+        self.client.logout()
+        login_resp = self.client.post(reverse('login'), {
+            'username': 'afrobeattester',
+            'password': 'password123',
+        }, HTTP_HOST='127.0.0.1', follow=True)
+        self.assertEqual(login_resp.status_code, 200)
+        self.assertContains(login_resp, preset_url)
+        self.assertContains(login_resp, 'user-avatar-img')
+
+    def test_signup_with_avatar_file_upload(self):
+        from django.core.files.uploadedfile import SimpleUploadedFile
+        avatar_file = SimpleUploadedFile("avatar.jpg", b"fake-image-bytes", content_type="image/jpeg")
+        response = self.client.post(reverse('signup'), {
+            'username': 'phototester',
+            'email': 'photo@example.com',
+            'password': 'password123',
+            'repeat_password': 'password123',
+            'avatar': avatar_file
+        }, HTTP_HOST='127.0.0.1', follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'phototester')
+        self.assertContains(response, 'user-avatar-img')
+

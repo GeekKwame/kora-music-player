@@ -277,6 +277,112 @@ input, textarea, select {
   flex-shrink: 0;
 }
 
+.user-avatar-img {
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-full);
+  object-fit: cover;
+  border: 2px solid var(--accent-gold);
+  box-shadow: 0 0 10px var(--accent-gold-glow);
+  flex-shrink: 0;
+}
+
+/* Avatar Picker on Signup / Profile */
+.avatar-picker-section {
+  background: var(--bg-surface-highlight);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  margin-bottom: 4px;
+}
+
+.avatar-preview-container {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.avatar-preview-circle {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-full);
+  border: 2px dashed var(--border-medium);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: var(--bg-surface);
+  flex-shrink: 0;
+}
+
+.avatar-preview-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: none;
+}
+
+.avatar-preview-placeholder {
+  font-size: 20px;
+  color: var(--text-dim);
+}
+
+.avatar-upload-btn-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.avatar-upload-btn-label:hover {
+  border-color: var(--accent-gold);
+  color: var(--accent-gold);
+  background: var(--bg-surface-hover);
+}
+
+.avatar-presets-grid {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+
+.avatar-preset-choice {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-full);
+  border: 2px solid transparent;
+  cursor: pointer;
+  overflow: hidden;
+  padding: 0;
+  background: none;
+  transition: all var(--transition-fast);
+}
+
+.avatar-preset-choice img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: var(--radius-full);
+}
+
+.avatar-preset-choice:hover,
+.avatar-preset-choice.selected {
+  border-color: var(--accent-gold);
+  box-shadow: 0 0 10px var(--accent-gold-glow);
+  transform: scale(1.12);
+}
+
 .user-greeting {
   font-size: var(--font-size-xs);
   color: var(--text-muted);

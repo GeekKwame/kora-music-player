@@ -29,7 +29,7 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-ia-h-3(k5o9k+-4#j6@**=0@3=
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'True').lower() in ('true', '1', 'yes')
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost 127.0.0.1 [::1] .onrender.com').split(' ')
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost 127.0.0.1 [::1] testserver .onrender.com').split(' ')
 RENDER_EXTERNAL_HOSTNAME = os.getenv('RENDER_EXTERNAL_HOSTNAME')
 if RENDER_EXTERNAL_HOSTNAME:
     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
@@ -140,6 +140,10 @@ STATICFILES_DIRS = [
     BASE_DIR / 'static',
 ]
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# Media files (User uploaded avatars)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 STORAGES = {
     "default": {
