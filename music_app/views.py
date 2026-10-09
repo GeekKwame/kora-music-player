@@ -1,10 +1,16 @@
+
 from django.shortcuts import render, redirect
+from django.http import JsonResponse
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from .spotify_service import search_spotify, get_artist_overview
 
 # Create your views here.
+def health_check(request):
+    return JsonResponse({"status": "healthy"})
+
+
 def home(request):
     # Fetch featured music and artists (cached)
     spotify_data = search_spotify('Afrobeats', limit=8)
