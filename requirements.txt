@@ -1,3 +1,6 @@
 Django>=5.0,<6.2
 asgiref>=3.8
 sqlparse>=0.5
+psycopg[binary]>=3.1
+python-dotenv>=1.0.0
+
