@@ -53,6 +53,10 @@ def profile(request, artist_id):
     return render(request, 'profile.html', context)
 
 
+def music_player(request):
+    return render(request, 'music.html')
+
+
 def signup(request):
     if request.user.is_authenticated:
         return redirect('home')

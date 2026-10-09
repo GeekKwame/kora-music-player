@@ -55,6 +55,14 @@ class KoraFrontendTests(TestCase):
         self.assertIn('Now Playing', html)
         self.assertIn('African Lofi Experience', html)
 
+    def test_music_player_route_and_audio_sources(self):
+        response = self.client.get(reverse('music_player'), HTTP_HOST='127.0.0.1')
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'music.html')
+        self.assertContains(response, 'African Lofi Experience')
+        self.assertContains(response, 'global-audio')
+        self.assertContains(response, 'african_lofi_experience.wav')
+
     def test_signup_with_avatar_preset_and_populate_on_login(self):
         # Signup with an avatar preset
         preset_url = "https://images.unsplash.com/photo-test-preset.jpg"

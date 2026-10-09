@@ -6,8 +6,10 @@
 {% block content %}
 <!-- Back to Search Navigation -->
 <div style="margin-bottom: 20px;">
-  <a href="{% url 'search' %}" class="btn btn-ghost" style="padding: 6px 14px; font-size: var(--font-size-xs); color: var(--text-muted); display: inline-flex; align-items: center; gap: 6px;">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+  <a href="{% url 'search' %}" class="btn btn-ghost"
+    style="padding: 6px 14px; font-size: var(--font-size-xs); color: var(--text-muted); display: inline-flex; align-items: center; gap: 6px;">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+      stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
       <line x1="19" y1="12" x2="5" y2="12"></line>
       <polyline points="12 19 5 12 12 5"></polyline>
     </svg>
@@ -16,127 +18,118 @@
 </div>
 
 {% if artist %}
-  <!-- Immersive Artist Hero -->
-  <header class="profile-hero" style="background-image: url('{{ artist.header_url }}');" role="banner">
-    <div class="profile-hero-overlay" aria-hidden="true"></div>
-    <div class="profile-hero-content">
-      <img 
-        src="{{ artist.avatar_url }}" 
-        alt="{{ artist.name }}" 
-        class="profile-avatar-img"
-        onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22140%22 height=%22140%22 fill=%22%23212634%22><circle cx=%2270%22 cy=%2270%22 r=%2270%22/><text x=%2250%%22 y=%2250%%22 fill=%22%23e5a93b%22 font-size=%2232%22 text-anchor=%22middle%22 dy=%22.3em%22>♪</text></svg>'"
-      >
-      <div style="min-width: 0;">
-        <div class="profile-verified-badge">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-          </svg>
-          Verified Artist
-        </div>
-        <h1 class="profile-artist-name">{{ artist.name }}</h1>
-        <p class="profile-listeners">
-          <strong style="color: var(--text-primary); font-weight: 700;">{{ artist.monthly_listeners }}</strong> monthly listeners
-        </p>
+<!-- Immersive Artist Hero -->
+<header class="profile-hero" style="background-image: url('{{ artist.header_url }}');" role="banner">
+  <div class="profile-hero-overlay" aria-hidden="true"></div>
+  <div class="profile-hero-content">
+    <img src="{{ artist.avatar_url }}" alt="{{ artist.name }}" class="profile-avatar-img"
+      onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22140%22 height=%22140%22 fill=%22%23212634%22><circle cx=%2270%22 cy=%2270%22 r=%2270%22/><text x=%2250%%22 y=%2250%%22 fill=%22%23e5a93b%22 font-size=%2232%22 text-anchor=%22middle%22 dy=%22.3em%22>♪</text></svg>'">
+    <div style="min-width: 0;">
+      <div class="profile-verified-badge">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path
+            d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+        </svg>
+        Verified Artist
       </div>
+      <h1 class="profile-artist-name">{{ artist.name }}</h1>
+      <p class="profile-listeners">
+        <strong style="color: var(--text-primary); font-weight: 700;">{{ artist.monthly_listeners }}</strong> monthly
+        listeners
+      </p>
     </div>
-  </header>
+  </div>
+</header>
 
-  <!-- Action Bar -->
-  <div class="profile-actions-bar">
-    {% if artist.top_tracks %}
-      <button 
-        type="button" 
-        class="btn btn-primary"
-        onclick="playTrack({ name: '{{ artist.top_tracks.0.name|escapejs }}', artist: '{{ artist.name|escapejs }}', image: '{{ artist.top_tracks.0.image_url|escapejs }}', duration: '{{ artist.top_tracks.0.duration|escapejs }}' })"
-        aria-label="Play top track by {{ artist.name }}"
-      >
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+<!-- Action Bar -->
+<div class="profile-actions-bar">
+  {% if artist.top_tracks %}
+  <button type="button" class="btn btn-primary"
+    onclick="playTrack({ name: '{{ artist.top_tracks.0.name|escapejs }}', artist: '{{ artist.name|escapejs }}', image: '{{ artist.top_tracks.0.image_url|escapejs }}', duration: '{{ artist.top_tracks.0.duration|escapejs }}', audio: '{{ artist.top_tracks.0.audio_url|escapejs }}' })"
+    aria-label="Play top track by {{ artist.name }}">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <polygon points="5 3 19 12 5 21 5 3"></polygon>
+    </svg>
+    Play Top Tracks
+  </button>
+  {% endif %}
+
+  <a href="{% url 'search' %}?q={{ artist.name|urlencode }}" class="btn btn-secondary">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+      stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <circle cx="11" cy="11" r="8"></circle>
+      <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+    Find More Songs
+  </a>
+</div>
+
+<!-- Popular Tracks Section -->
+{% if artist.top_tracks %}
+<section style="margin-bottom: 40px;" aria-labelledby="profile-popular-heading">
+  <div class="section-header">
+    <div>
+      <h2 class="section-title" id="profile-popular-heading">Popular Releases</h2>
+      <p class="section-subtitle">Most played recordings by {{ artist.name }}</p>
+    </div>
+  </div>
+
+  <div class="track-list-card" role="region" aria-label="Popular tracks">
+    {% for track in artist.top_tracks %}
+    <div class="track-row-item">
+      <span class="track-number">{{ forloop.counter }}</span>
+      <img src="{{ track.image_url }}" alt="{{ track.name }} artwork" class="track-thumb-img" loading="lazy">
+      <div class="track-meta">
+        <div class="track-title">{{ track.name }}</div>
+        <div class="track-artists-album">
+          <span>{{ artist.name }}</span>
+          {% if track.playcount and track.playcount != '0' %}
+          • {{ track.playcount }} plays
+          {% endif %}
+        </div>
+      </div>
+
+      <button type="button" class="track-play-trigger" aria-label="Play {{ track.name }} by {{ artist.name }}"
+        onclick="playTrack({ name: '{{ track.name|escapejs }}', artist: '{{ artist.name|escapejs }}', image: '{{ track.image_url|escapejs }}', duration: '{{ track.duration|escapejs }}', audio: '{{ track.audio_url|escapejs }}' })">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
           <polygon points="5 3 19 12 5 21 5 3"></polygon>
         </svg>
-        Play Top Tracks
       </button>
-    {% endif %}
 
-    <a href="{% url 'search' %}?q={{ artist.name|urlencode }}" class="btn btn-secondary">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <circle cx="11" cy="11" r="8"></circle>
-        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-      </svg>
-      Find More Songs
-    </a>
+      <span class="track-duration">{{ track.duration }}</span>
+    </div>
+    {% endfor %}
   </div>
+</section>
+{% endif %}
 
-  <!-- Popular Tracks Section -->
-  {% if artist.top_tracks %}
-    <section style="margin-bottom: 40px;" aria-labelledby="profile-popular-heading">
-      <div class="section-header">
-        <div>
-          <h2 class="section-title" id="profile-popular-heading">Popular Releases</h2>
-          <p class="section-subtitle">Most played recordings by {{ artist.name }}</p>
-        </div>
-      </div>
-
-      <div class="track-list-card" role="region" aria-label="Popular tracks">
-        {% for track in artist.top_tracks %}
-          <div class="track-row-item">
-            <span class="track-number">{{ forloop.counter }}</span>
-            <img 
-              src="{{ track.image_url }}" 
-              alt="{{ track.name }} artwork" 
-              class="track-thumb-img"
-              loading="lazy"
-            >
-            <div class="track-meta">
-              <div class="track-title">{{ track.name }}</div>
-              <div class="track-artists-album">
-                <span>{{ artist.name }}</span>
-                {% if track.playcount and track.playcount != '0' %}
-                  • {{ track.playcount }} plays
-                {% endif %}
-              </div>
-            </div>
-
-            <button 
-              type="button" 
-              class="track-play-trigger" 
-              aria-label="Play {{ track.name }} by {{ artist.name }}"
-              onclick="playTrack({ name: '{{ track.name|escapejs }}', artist: '{{ artist.name|escapejs }}', image: '{{ track.image_url|escapejs }}', duration: '{{ track.duration|escapejs }}' })"
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                <polygon points="5 3 19 12 5 21 5 3"></polygon>
-              </svg>
-            </button>
-
-            <span class="track-duration">{{ track.duration }}</span>
-          </div>
-        {% endfor %}
-      </div>
-    </section>
-  {% endif %}
-
-  <!-- About / Biography Section -->
-  {% if artist.biography %}
-    <section class="profile-about-card" aria-labelledby="profile-about-heading">
-      <h2 class="profile-about-title" id="profile-about-heading">About {{ artist.name }}</h2>
-      <p class="profile-about-text">{{ artist.biography }}</p>
-    </section>
-  {% endif %}
+<!-- About / Biography Section -->
+{% if artist.biography %}
+<section class="profile-about-card" aria-labelledby="profile-about-heading">
+  <h2 class="profile-about-title" id="profile-about-heading">About {{ artist.name }}</h2>
+  <p class="profile-about-text">{{ artist.biography }}</p>
+</section>
+{% endif %}
 
 {% else %}
-  <!-- Fallback When Artist Data Is Unavailable -->
-  <div style="text-align: center; padding: 72px 24px; background: var(--bg-surface-elevated); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg);">
-    <div style="width: 64px; height: 64px; border-radius: var(--radius-full); background: var(--bg-surface-highlight); display: flex; align-items: center; justify-content: center; margin: 0 auto 18px; color: var(--accent-gold);">
-      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <circle cx="12" cy="12" r="10"></circle>
-        <line x1="12" y1="8" x2="12" y2="12"></line>
-        <line x1="12" y1="16" x2="12.01" y2="16"></line>
-      </svg>
-    </div>
-    <h1 style="font-size: var(--font-size-2xl); font-weight: 800; color: var(--text-primary); margin-bottom: 8px;">Artist Unavailable</h1>
-    <p style="font-size: var(--font-size-sm); color: var(--text-muted); max-width: 420px; margin: 0 auto 24px;">
-      We could not load information for this artist at the moment.
-    </p>
-    <a href="{% url 'search' %}" class="btn btn-primary">Return to Search</a>
+<!-- Fallback When Artist Data Is Unavailable -->
+<div
+  style="text-align: center; padding: 72px 24px; background: var(--bg-surface-elevated); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg);">
+  <div
+    style="width: 64px; height: 64px; border-radius: var(--radius-full); background: var(--bg-surface-highlight); display: flex; align-items: center; justify-content: center; margin: 0 auto 18px; color: var(--accent-gold);">
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+      stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <circle cx="12" cy="12" r="10"></circle>
+      <line x1="12" y1="8" x2="12" y2="12"></line>
+      <line x1="12" y1="16" x2="12.01" y2="16"></line>
+    </svg>
   </div>
+  <h1 style="font-size: var(--font-size-2xl); font-weight: 800; color: var(--text-primary); margin-bottom: 8px;">Artist
+    Unavailable</h1>
+  <p style="font-size: var(--font-size-sm); color: var(--text-muted); max-width: 420px; margin: 0 auto 24px;">
+    We could not load information for this artist at the moment.
+  </p>
+  <a href="{% url 'search' %}" class="btn btn-primary">Return to Search</a>
+</div>
 {% endif %}
 {% endblock %}

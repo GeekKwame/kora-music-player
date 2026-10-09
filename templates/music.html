@@ -95,19 +95,126 @@
 
 {% block extra_js %}
 <script>
-  // Link standalone controls to global player
+  // Link standalone full-screen controls to global audio engine
   (function() {
     const sPlayBtn = document.getElementById('standalone-play-btn');
     const sPlayIcon = document.getElementById('standalone-play-icon');
     const sPauseIcon = document.getElementById('standalone-pause-icon');
-    const gPlayBtn = document.getElementById('player-play-btn');
+    const sPrevBtn = document.getElementById('standalone-prev-btn');
+    const sNextBtn = document.getElementById('standalone-next-btn');
+    const sRepeatBtn = document.getElementById('standalone-repeat-btn');
+    const sShuffleBtn = document.getElementById('standalone-shuffle-btn');
+    const sCover = document.getElementById('standalone-cover');
+    const sTitle = document.getElementById('standalone-title');
+    const sArtist = document.getElementById('standalone-artist');
+    const sCurrTime = document.getElementById('standalone-curr-time');
+    const sTotalTime = document.getElementById('standalone-total-time');
+    const sProgressFill = document.getElementById('standalone-progress-fill');
+    const sProgressBar = document.getElementById('standalone-progress-bar');
 
-    if (sPlayBtn && gPlayBtn) {
-      sPlayBtn.addEventListener('click', function() {
-        gPlayBtn.click();
-        const isPaused = sPlayIcon.style.display === 'none';
-        sPlayIcon.style.display = isPaused ? 'block' : 'none';
-        sPauseIcon.style.display = isPaused ? 'none' : 'block';
+    function syncTrackInfo(track) {
+      if (!track) return;
+      if (sTitle && track.name) sTitle.textContent = track.name;
+      if (sArtist && track.artist) sArtist.textContent = track.artist;
+      if (sCover && track.image) sCover.src = track.image;
+      if (sTotalTime && track.duration) sTotalTime.textContent = track.duration;
+    }
+
+    function syncPlayState(isPlaying) {
+      if (sPlayIcon && sPauseIcon) {
+        sPlayIcon.style.display = isPlaying ? 'none' : 'block';
+        sPauseIcon.style.display = isPlaying ? 'block' : 'none';
+      }
+      if (sCover) {
+        if (isPlaying) {
+          sCover.style.boxShadow = '0 12px 40px rgba(229, 169, 59, 0.4)';
+          sCover.style.transform = 'scale(1.02)';
+        } else {
+          sCover.style.boxShadow = '0 8px 30px rgba(0, 0, 0, 0.5)';
+          sCover.style.transform = 'scale(1)';
+        }
+        sCover.style.transition = 'transform 0.4s ease, box-shadow 0.4s ease';
+      }
+    }
+
+    function formatTime(secs) {
+      if (isNaN(secs) || secs < 0) return '0:00';
+      const m = Math.floor(secs / 60);
+      const s = Math.floor(secs % 60);
+      return m + ':' + (s < 10 ? '0' : '') + s;
+    }
+
+    // Initial sync
+    if (window.koraPlayer) {
+      syncTrackInfo(window.koraPlayer.getCurrentTrack());
+      syncPlayState(window.koraPlayer.isPlaying());
+    }
+
+    // Listen to custom player events
+    window.addEventListener('kora:trackchange', function(e) {
+      syncTrackInfo(e.detail);
+    });
+
+    window.addEventListener('kora:playstate', function(e) {
+      syncPlayState(e.detail.isPlaying);
+    });
+
+    window.addEventListener('kora:timeupdate', function(e) {
+      const detail = e.detail;
+      if (sCurrTime) sCurrTime.textContent = formatTime(detail.currentTime);
+      if (sTotalTime && detail.duration) sTotalTime.textContent = formatTime(detail.duration);
+      if (sProgressFill && detail.percent !== undefined) sProgressFill.style.width = detail.percent + '%';
+      if (sProgressBar) sProgressBar.setAttribute('aria-valuenow', Math.round(detail.percent || 0));
+    });
+
+    // Control clicks
+    if (sPlayBtn) {
+      sPlayBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        if (window.koraPlayer) window.koraPlayer.togglePlay();
+      });
+    }
+
+    if (sPrevBtn) {
+      sPrevBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        if (window.koraPlayer) window.koraPlayer.prev();
+      });
+    }
+
+    if (sNextBtn) {
+      sNextBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        if (window.koraPlayer) window.koraPlayer.next();
+      });
+    }
+
+    if (sProgressBar) {
+      sProgressBar.addEventListener('click', function(e) {
+        e.stopPropagation();
+        const rect = sProgressBar.getBoundingClientRect();
+        const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+        if (window.koraPlayer) window.koraPlayer.seek(ratio * 100);
+      });
+    }
+
+    if (sRepeatBtn) {
+      let isLoop = false;
+      sRepeatBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        const audio = window.koraPlayer ? window.koraPlayer.getAudio() : null;
+        if (audio) {
+          audio.loop = !audio.loop;
+          isLoop = audio.loop;
+          sRepeatBtn.style.color = isLoop ? 'var(--accent-gold)' : 'inherit';
+        }
+      });
+    }
+
+    if (sShuffleBtn) {
+      sShuffleBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        if (window.koraPlayer) window.koraPlayer.next();
       });
     }
   })();

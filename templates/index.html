@@ -57,15 +57,15 @@
   <h1 class="hero-title" id="hero-heading">Rhythms of the Motherland, Elevated.</h1>
   <p class="hero-desc">Immerse yourself in handpicked Afrobeats, Amapiano pulses, and acoustic African warmth—crafted for true music discovery.</p>
   <div class="hero-actions">
-    <a href="{% url 'search' %}?q=Afrobeats" class="btn btn-primary">
+    <button type="button" class="btn btn-primary" onclick="playTrack({ name: 'Afrobeat Essentials', artist: 'Kora Soundscapes', image: '{% static 'neo_africa_encounter.png' %}', duration: '0:30', audio: '/static/audio/afrobeat_essentials.wav' })">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
         <polygon points="5 3 19 12 5 21 5 3"></polygon>
       </svg>
       Listen to Afrobeat Essentials
-    </a>
-    <a href="{% url 'search' %}?q=Amapiano" class="btn btn-secondary">
-      Explore Amapiano Heat
-    </a>
+    </button>
+    <button type="button" class="btn btn-secondary" onclick="playTrack({ name: 'Amapiano Heat', artist: 'Kora Soundscapes', image: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=150&auto=format&fit=crop&q=80', duration: '0:30', audio: '/static/audio/amapiano_heat.wav' })">
+      Play Amapiano Heat
+    </button>
   </div>
 </section>
 
@@ -180,7 +180,7 @@
             type="button" 
             class="track-play-trigger" 
             aria-label="Play {{ track.name }} by {{ track.artist_name }}"
-            onclick="playTrack({ name: '{{ track.name|escapejs }}', artist: '{{ track.artist_name|escapejs }}', image: '{{ track.image_url|escapejs }}', duration: '{{ track.duration|escapejs }}' })"
+            onclick="playTrack({ name: '{{ track.name|escapejs }}', artist: '{{ track.artist_name|escapejs }}', image: '{{ track.image_url|escapejs }}', duration: '{{ track.duration|escapejs }}', audio: '{{ track.audio_url|escapejs }}' })"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
               <polygon points="5 3 19 12 5 21 5 3"></polygon>
@@ -199,7 +199,7 @@
           <div class="track-title">Last Last</div>
           <div class="track-artists-album">Burna Boy • Love, Damini</div>
         </div>
-        <button type="button" class="track-play-trigger" aria-label="Play Last Last" onclick="playTrack({ name: 'Last Last', artist: 'Burna Boy', image: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=120&auto=format&fit=crop&q=80', duration: '2:52' })">
+        <button type="button" class="track-play-trigger" aria-label="Play Last Last" onclick="playTrack({ name: 'Last Last', artist: 'Burna Boy', image: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=120&auto=format&fit=crop&q=80', duration: '2:52', audio: '/static/audio/afrobeat_essentials.wav' })">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
         </button>
         <span class="track-duration">2:52</span>
@@ -211,7 +211,7 @@
           <div class="track-title">Calm Down</div>
           <div class="track-artists-album">Rema • Rave & Roses</div>
         </div>
-        <button type="button" class="track-play-trigger" aria-label="Play Calm Down" onclick="playTrack({ name: 'Calm Down', artist: 'Rema', image: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=120&auto=format&fit=crop&q=80', duration: '3:39' })">
+        <button type="button" class="track-play-trigger" aria-label="Play Calm Down" onclick="playTrack({ name: 'Calm Down', artist: 'Rema', image: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=120&auto=format&fit=crop&q=80', duration: '3:39', audio: '/static/audio/amapiano_heat.wav' })">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
         </button>
         <span class="track-duration">3:39</span>
@@ -223,7 +223,7 @@
           <div class="track-title">Lonely At The Top</div>
           <div class="track-artists-album">Asake • Work of Art</div>
         </div>
-        <button type="button" class="track-play-trigger" aria-label="Play Lonely At The Top" onclick="playTrack({ name: 'Lonely At The Top', artist: 'Asake', image: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=120&auto=format&fit=crop&q=80', duration: '2:37' })">
+        <button type="button" class="track-play-trigger" aria-label="Play Lonely At The Top" onclick="playTrack({ name: 'Lonely At The Top', artist: 'Asake', image: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=120&auto=format&fit=crop&q=80', duration: '2:37', audio: '/static/audio/highlife_classics.wav' })">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
         </button>
         <span class="track-duration">2:37</span>

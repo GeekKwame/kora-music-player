@@ -20,6 +20,22 @@ def _get_headers():
     }
 
 
+SOUNDSCAPE_TRACKS = [
+    '/static/audio/african_lofi_experience.wav',
+    '/static/audio/afrobeat_essentials.wav',
+    '/static/audio/amapiano_heat.wav',
+    '/static/audio/highlife_classics.wav',
+    '/static/audio/desert_blues.wav',
+]
+
+
+def get_soundscape_audio(key):
+    if not key:
+        return SOUNDSCAPE_TRACKS[0]
+    val = sum(ord(c) for c in str(key))
+    return SOUNDSCAPE_TRACKS[val % len(SOUNDSCAPE_TRACKS)]
+
+
 def format_duration(ms):
     if not ms:
         return "--:--"
@@ -115,6 +131,7 @@ def search_spotify(query, limit=10):
                     "album_name": album.get("name", ""),
                     "image_url": image_url,
                     "duration": format_duration(duration_ms),
+                    "audio_url": get_soundscape_audio(d.get("name") or d.get("id")),
                     "uri": d.get("uri", ""),
                 })
 
@@ -191,6 +208,7 @@ def get_artist_overview(artist_id):
                 "name": track.get("name"),
                 "image_url": image_url,
                 "duration": format_duration(duration_ms),
+                "audio_url": get_soundscape_audio(track.get("name") or track.get("id")),
                 "playcount": formatted_playcount,
             })
 

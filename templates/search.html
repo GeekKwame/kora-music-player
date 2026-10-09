@@ -125,7 +125,7 @@
               type="button" 
               class="track-play-trigger" 
               aria-label="Play {{ track.name }} by {{ track.artist_name }}"
-              onclick="playTrack({ name: '{{ track.name|escapejs }}', artist: '{{ track.artist_name|escapejs }}', image: '{{ track.image_url|escapejs }}', duration: '{{ track.duration|escapejs }}' })"
+              onclick="playTrack({ name: '{{ track.name|escapejs }}', artist: '{{ track.artist_name|escapejs }}', image: '{{ track.image_url|escapejs }}', duration: '{{ track.duration|escapejs }}', audio: '{{ track.audio_url|escapejs }}' })"
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                 <polygon points="5 3 19 12 5 21 5 3"></polygon>

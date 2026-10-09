@@ -294,14 +294,14 @@
 
   <!-- Persistent Bottom Player Dock -->
   <aside class="player-dock" id="global-player-dock" aria-label="Audio Player">
-    <!-- Left: Track Details -->
-    <div class="player-track-info">
+    <!-- Left: Track Details (Click to open full player view) -->
+    <a href="{% url 'music_player' %}" class="player-track-info" style="text-decoration: none; color: inherit; cursor: pointer;" title="Open Now Playing full screen">
       <img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=150&auto=format&fit=crop&q=80" alt="Album artwork" class="player-cover-art" id="player-artwork" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2252%22 height=%2252%22 fill=%22%23212634%22><rect width=%2252%22 height=%2252%22/><text x=%2250%%22 y=%2250%%22 fill=%22%2394a3b8%22 font-size=%2220%22 text-anchor=%22middle%22 dy=%22.3em%22>♪</text></svg>'">
       <div class="player-meta-details">
         <div class="player-track-name" id="player-track-title">African Lofi Experience</div>
         <div class="player-artist-name" id="player-track-artist">Kora Sounds</div>
       </div>
-    </div>
+    </a>
 
     <!-- Center: Playback Controls & Progress -->
     <div class="player-controls-container">
@@ -336,7 +336,7 @@
         <div class="player-progress-bar" id="player-progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0" aria-label="Track playback position">
           <div class="player-progress-fill" id="player-progress-fill" style="width: 0%;"></div>
         </div>
-        <span class="player-time-total" id="player-total-time">3:45</span>
+        <span class="player-time-total" id="player-total-time">0:30</span>
       </div>
     </div>
 
@@ -344,17 +344,22 @@
     <div class="player-extra-controls">
       <div class="volume-slider-wrapper">
         <button type="button" class="player-btn" id="volume-toggle-btn" aria-label="Mute or unmute">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <svg id="volume-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
             <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
           </svg>
+          <svg id="mute-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display: none;">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <line x1="23" y1="9" x2="17" y2="15"></line>
+            <line x1="17" y1="9" x2="23" y2="15"></line>
+          </svg>
         </button>
-        <input type="range" min="0" max="100" value="75" class="volume-range-input" id="volume-slider" aria-label="Volume level">
+        <input type="range" min="0" max="100" value="80" class="volume-range-input" id="volume-slider" aria-label="Volume level">
       </div>
     </div>
 
-    <!-- Hidden audio element for preview playback -->
-    <audio id="global-audio" preload="none"></audio>
+    <!-- Persistent audio element -->
+    <audio id="global-audio" preload="auto" src="/static/audio/african_lofi_experience.wav"></audio>
   </aside>
 
   <!-- Global Application Scripts -->
@@ -393,10 +398,13 @@
         }
       });
 
-      // Global Player Controller
+      // Global Player Controller & Sound Engine
+      const audio = document.getElementById('global-audio');
       const playBtn = document.getElementById('player-play-btn');
       const playIcon = document.getElementById('play-icon');
       const pauseIcon = document.getElementById('pause-icon');
+      const prevBtn = document.getElementById('player-prev-btn');
+      const nextBtn = document.getElementById('player-next-btn');
       const titleElem = document.getElementById('player-track-title');
       const artistElem = document.getElementById('player-track-artist');
       const artworkElem = document.getElementById('player-artwork');
@@ -404,81 +412,271 @@
       const progressTrack = document.getElementById('player-progress-track');
       const currentTimeElem = document.getElementById('player-current-time');
       const totalTimeElem = document.getElementById('player-total-time');
-      const audio = document.getElementById('global-audio');
+      const volumeSlider = document.getElementById('volume-slider');
+      const volumeToggleBtn = document.getElementById('volume-toggle-btn');
+      const volumeIcon = document.getElementById('volume-icon');
+      const muteIcon = document.getElementById('mute-icon');
 
-      let isPlaying = false;
-      let progressInterval = null;
-      let currentProgressPercent = 0;
-      let playbackSeconds = 0;
-      let totalSeconds = 210;
+      const SOUNDSCAPES = [
+        { name: 'African Lofi Experience', artist: 'Kora Sounds', audio: '/static/audio/african_lofi_experience.wav', image: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=150&auto=format&fit=crop&q=80', duration: '0:30' },
+        { name: 'Afrobeat Essentials', artist: 'Kora Soundscapes', audio: '/static/audio/afrobeat_essentials.wav', image: '/static/neo_africa_encounter.png', duration: '0:30' },
+        { name: 'Amapiano Heat', artist: 'Kora Soundscapes', audio: '/static/audio/amapiano_heat.wav', image: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=150&auto=format&fit=crop&q=80', duration: '0:30' },
+        { name: 'Highlife Classics', artist: 'Kora Soundscapes', audio: '/static/audio/highlife_classics.wav', image: 'https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=150&auto=format&fit=crop&q=80', duration: '0:30' },
+        { name: 'Desert Blues', artist: 'Kora Soundscapes', audio: '/static/audio/desert_blues.wav', image: 'https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?w=150&auto=format&fit=crop&q=80', duration: '0:30' }
+      ];
+
+      function resolveSoundscapeAudio(name) {
+        if (!name) return SOUNDSCAPES[0].audio;
+        let hash = 0;
+        for (let i = 0; i < name.length; i++) hash = (hash + name.charCodeAt(i)) % SOUNDSCAPES.length;
+        return SOUNDSCAPES[hash].audio;
+      }
 
       function formatTime(secs) {
+        if (isNaN(secs) || secs < 0) return '0:00';
         const m = Math.floor(secs / 60);
         const s = Math.floor(secs % 60);
         return m + ':' + (s < 10 ? '0' : '') + s;
       }
 
-      function updatePlayState(playing) {
-        isPlaying = playing;
+      let currentTrack = JSON.parse(sessionStorage.getItem('kora_current_track') || 'null') || SOUNDSCAPES[0];
+      let queue = [SOUNDSCAPES[0], SOUNDSCAPES[1], SOUNDSCAPES[2], SOUNDSCAPES[3], SOUNDSCAPES[4]];
+      let queueIndex = 0;
+
+      function updatePlayStateUI(isPlaying) {
         if (playIcon && pauseIcon) {
-          playIcon.style.display = playing ? 'none' : 'block';
-          pauseIcon.style.display = playing ? 'block' : 'none';
+          playIcon.style.display = isPlaying ? 'none' : 'block';
+          pauseIcon.style.display = isPlaying ? 'block' : 'none';
         }
         if (playBtn) {
-          playBtn.setAttribute('aria-label', playing ? 'Pause track' : 'Play track');
+          playBtn.setAttribute('aria-label', isPlaying ? 'Pause track' : 'Play track');
         }
+        if (artworkElem) {
+          if (isPlaying) {
+            artworkElem.style.boxShadow = '0 0 16px rgba(229, 169, 59, 0.45)';
+            artworkElem.style.borderColor = 'var(--accent-gold)';
+          } else {
+            artworkElem.style.boxShadow = 'none';
+            artworkElem.style.borderColor = 'var(--border-subtle)';
+          }
+        }
+        window.dispatchEvent(new CustomEvent('kora:playstate', { detail: { isPlaying: isPlaying } }));
+      }
 
-        if (playing) {
-          if (progressInterval) clearInterval(progressInterval);
-          progressInterval = setInterval(function() {
-            playbackSeconds += 1;
-            if (playbackSeconds > totalSeconds) playbackSeconds = 0;
-            currentProgressPercent = (playbackSeconds / totalSeconds) * 100;
-            if (progressFill) progressFill.style.width = currentProgressPercent + '%';
-            if (currentTimeElem) currentTimeElem.textContent = formatTime(playbackSeconds);
-            if (progressTrack) progressTrack.setAttribute('aria-valuenow', Math.round(currentProgressPercent));
-          }, 1000);
-        } else {
-          if (progressInterval) clearInterval(progressInterval);
+      function updateVolumeUI() {
+        const isMuted = audio.muted || audio.volume === 0;
+        if (volumeIcon && muteIcon) {
+          volumeIcon.style.display = isMuted ? 'none' : 'block';
+          muteIcon.style.display = isMuted ? 'block' : 'none';
+        }
+        if (volumeSlider) {
+          volumeSlider.value = isMuted ? 0 : Math.round(audio.volume * 100);
         }
       }
 
+      // Initialize initial track metadata in UI
+      if (titleElem && currentTrack.name) titleElem.textContent = currentTrack.name;
+      if (artistElem && currentTrack.artist) artistElem.textContent = currentTrack.artist;
+      if (artworkElem && currentTrack.image) artworkElem.src = currentTrack.image;
+      if (totalTimeElem && currentTrack.duration) totalTimeElem.textContent = currentTrack.duration;
+
+      // Ensure audio has valid source
+      if (!audio.src) {
+        audio.src = currentTrack.audio || SOUNDSCAPES[0].audio;
+      }
+
+      // Audio element listeners
+      audio.addEventListener('play', function() {
+        updatePlayStateUI(true);
+      });
+
+      audio.addEventListener('pause', function() {
+        updatePlayStateUI(false);
+      });
+
+      audio.addEventListener('timeupdate', function() {
+        const current = audio.currentTime;
+        const total = audio.duration;
+        if (currentTimeElem) currentTimeElem.textContent = formatTime(current);
+        if (total && !isNaN(total)) {
+          const percent = (current / total) * 100;
+          if (progressFill) progressFill.style.width = percent + '%';
+          if (progressTrack) progressTrack.setAttribute('aria-valuenow', Math.round(percent));
+          if (totalTimeElem) totalTimeElem.textContent = formatTime(total);
+        }
+        window.dispatchEvent(new CustomEvent('kora:timeupdate', { 
+          detail: { currentTime: current, duration: total, percent: total ? (current / total) * 100 : 0 } 
+        }));
+      });
+
+      audio.addEventListener('loadedmetadata', function() {
+        if (audio.duration && !isNaN(audio.duration) && totalTimeElem) {
+          totalTimeElem.textContent = formatTime(audio.duration);
+        }
+      });
+
+      audio.addEventListener('ended', function() {
+        playNextTrack();
+      });
+
+      audio.addEventListener('error', function(e) {
+        console.warn('Audio playback error, falling back to soundscape:', e);
+        // Fall back to primary lofi soundscape
+        const fallbackUrl = SOUNDSCAPES[0].audio;
+        if (audio.src !== fallbackUrl) {
+          audio.src = fallbackUrl;
+          audio.play().catch(function(err) { console.error('Fallback error:', err); });
+        }
+      });
+
+      // Play / Pause Toggle
       if (playBtn) {
-        playBtn.addEventListener('click', function() {
-          updatePlayState(!isPlaying);
+        playBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          if (audio.paused) {
+            audio.play().catch(function(err) {
+              console.warn('Autoplay / Audio play restriction:', err);
+            });
+          } else {
+            audio.pause();
+          }
         });
       }
+
+      // Next / Previous Track
+      function playNextTrack() {
+        if (queue.length > 1) {
+          queueIndex = (queueIndex + 1) % queue.length;
+          window.playTrack(queue[queueIndex]);
+        } else {
+          queueIndex = (queueIndex + 1) % SOUNDSCAPES.length;
+          window.playTrack(SOUNDSCAPES[queueIndex]);
+        }
+      }
+
+      function playPrevTrack() {
+        if (audio.currentTime > 3) {
+          audio.currentTime = 0;
+          return;
+        }
+        if (queue.length > 1) {
+          queueIndex = (queueIndex - 1 + queue.length) % queue.length;
+          window.playTrack(queue[queueIndex]);
+        } else {
+          queueIndex = (queueIndex - 1 + SOUNDSCAPES.length) % SOUNDSCAPES.length;
+          window.playTrack(SOUNDSCAPES[queueIndex]);
+        }
+      }
+
+      if (nextBtn) nextBtn.addEventListener('click', function(e) { e.stopPropagation(); playNextTrack(); });
+      if (prevBtn) prevBtn.addEventListener('click', function(e) { e.stopPropagation(); playPrevTrack(); });
 
       // Seek on progress bar click
       if (progressTrack) {
         progressTrack.addEventListener('click', function(e) {
+          e.stopPropagation();
+          if (!audio.duration || isNaN(audio.duration)) return;
           const rect = progressTrack.getBoundingClientRect();
           const clickX = e.clientX - rect.left;
           const ratio = Math.max(0, Math.min(1, clickX / rect.width));
-          playbackSeconds = Math.round(ratio * totalSeconds);
-          currentProgressPercent = ratio * 100;
-          if (progressFill) progressFill.style.width = currentProgressPercent + '%';
-          if (currentTimeElem) currentTimeElem.textContent = formatTime(playbackSeconds);
+          audio.currentTime = ratio * audio.duration;
         });
       }
 
-      // Public API to trigger playing a selected track from cards/rows
-      window.playTrack = function(data) {
-        if (!data) return;
-        if (titleElem && data.name) titleElem.textContent = data.name;
-        if (artistElem && data.artist) artistElem.textContent = data.artist;
-        if (artworkElem && data.image) {
-          artworkElem.src = data.image;
-        }
-        if (data.duration) {
-          if (totalTimeElem) totalTimeElem.textContent = data.duration;
-          const parts = data.duration.split(':');
-          if (parts.length === 2) {
-            totalSeconds = (parseInt(parts[0], 10) || 3) * 60 + (parseInt(parts[1], 10) || 30);
+      // Volume Slider
+      if (volumeSlider) {
+        audio.volume = parseFloat(volumeSlider.value) / 100;
+        volumeSlider.addEventListener('input', function() {
+          const val = parseFloat(this.value) / 100;
+          audio.volume = val;
+          if (audio.muted && val > 0) audio.muted = false;
+          updateVolumeUI();
+        });
+      }
+
+      // Volume Mute Button
+      if (volumeToggleBtn) {
+        volumeToggleBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          audio.muted = !audio.muted;
+          updateVolumeUI();
+        });
+      }
+
+      // Keyboard Controls (Space to toggle play/pause when not in inputs)
+      document.addEventListener('keydown', function(e) {
+        if (e.code === 'Space' && !['INPUT', 'TEXTAREA', 'SELECT', 'BUTTON'].includes(document.activeElement.tagName)) {
+          e.preventDefault();
+          if (audio.paused) {
+            audio.play().catch(function() {});
+          } else {
+            audio.pause();
           }
         }
-        playbackSeconds = 0;
-        updatePlayState(true);
+      });
+
+      // Public API: window.playTrack(data)
+      window.playTrack = function(data) {
+        if (!data) return;
+        currentTrack = {
+          name: data.name || 'African Soundscape',
+          artist: data.artist || 'Kora Music',
+          image: data.image || SOUNDSCAPES[0].image,
+          duration: data.duration || '0:30',
+          audio: data.audio || resolveSoundscapeAudio(data.name)
+        };
+
+        sessionStorage.setItem('kora_current_track', JSON.stringify(currentTrack));
+
+        // Add to queue if not present
+        const exists = queue.some(function(t) { return t.name === currentTrack.name; });
+        if (!exists) {
+          queue.push(currentTrack);
+          queueIndex = queue.length - 1;
+        } else {
+          queueIndex = queue.findIndex(function(t) { return t.name === currentTrack.name; });
+        }
+
+        // Update DOM metadata
+        if (titleElem) titleElem.textContent = currentTrack.name;
+        if (artistElem) artistElem.textContent = currentTrack.artist;
+        if (artworkElem && currentTrack.image) artworkElem.src = currentTrack.image;
+        if (totalTimeElem && currentTrack.duration) totalTimeElem.textContent = currentTrack.duration;
+        if (progressFill) progressFill.style.width = '0%';
+        if (currentTimeElem) currentTimeElem.textContent = '0:00';
+
+        // Set and play real audio
+        const audioSrc = currentTrack.audio || resolveSoundscapeAudio(currentTrack.name);
+        audio.src = audioSrc;
+        audio.currentTime = 0;
+        
+        const playPromise = audio.play();
+        if (playPromise !== undefined) {
+          playPromise.then(function() {
+            updatePlayStateUI(true);
+          }).catch(function(err) {
+            console.warn('Playback deferred (awaiting user gesture):', err);
+            updatePlayStateUI(false);
+          });
+        }
+
+        window.dispatchEvent(new CustomEvent('kora:trackchange', { detail: currentTrack }));
+      };
+
+      // Export global player controller
+      window.koraPlayer = {
+        playTrack: window.playTrack,
+        togglePlay: function() {
+          if (audio.paused) audio.play(); else audio.pause();
+        },
+        next: playNextTrack,
+        prev: playPrevTrack,
+        seek: function(percent) {
+          if (audio.duration) audio.currentTime = (percent / 100) * audio.duration;
+        },
+        getAudio: function() { return audio; },
+        getCurrentTrack: function() { return currentTrack; },
+        isPlaying: function() { return !audio.paused; }
       };
 
       // Image Fallback Handler for any broken images
