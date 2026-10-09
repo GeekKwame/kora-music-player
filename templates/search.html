@@ -1,178 +1,185 @@
+{% extends 'base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kora - Search Spotify</title>
-  <link rel="icon" type="image/x-icon" href="{% static 'favicon.ico' %}">
-  <link rel="icon" type="image/png" sizes="32x32" href="{% static 'favicon-32x32.png' %}">
-  <link rel="icon" type="image/png" sizes="16x16" href="{% static 'favicon-16x16.png' %}">
-  <link rel="apple-touch-icon" sizes="180x180" href="{% static 'apple-touch-icon.png' %}">
-  <link rel="stylesheet" type="text/css" href="{% static 'search-style.css' %}" />
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.1.4/dist/tailwind.min.css" rel="stylesheet">
-  <style>
-    body {
-      background-color: #121212;
-      color: #fff;
-      font-family: Arial, sans-serif;
-    }
-    .sidebar {
-      width: 240px;
-      min-height: 100vh;
-      background-color: #000;
-      padding: 20px;
-      position: fixed;
-    }
-    .main-content {
-      margin-left: 240px;
-      padding: 24px;
-      min-height: 100vh;
-      width: calc(100% - 240px);
-    }
-    .search-input {
-      background: #242424;
-      border: 1px solid #333;
-      border-radius: 500px;
-      padding: 10px 42px 10px 18px;
-      color: #fff;
-      width: 380px;
-    }
-    .search-input:focus {
-      outline: none;
-      border-color: #e5a93b;
-      box-shadow: 0 0 0 2px rgba(229, 169, 59, 0.2);
-    }
-  </style>
-</head>
-<body class="flex">
 
-  <!-- Sidebar -->
-  <div class="sidebar">
-    <div class="logo-container" style="text-align: center; margin-bottom: 24px;">
-      <a href="{% url 'home' %}">
-        <img src="{% static 'kora_logo.png' %}" alt="Kora Logo" style="max-width: 170px; width: 100%; height: auto; display: block; margin: 0 auto;">
-      </a>
-    </div>
+{% block title %}Kora - Search & Discover Music{% endblock %}
+{% block nav_search %}active{% endblock %}
+{% block nav_search_mobile %}active{% endblock %}
+{% block nav_search_tab %}active{% endblock %}
 
-    <!-- Auth Status -->
-    <div class="mb-6 pb-4 border-b border-gray-800 text-sm">
-      {% if request.user.is_authenticated %}
-        <div class="text-gray-300">👤 <b>{{ request.user.username }}</b></div>
-        <a href="{% url 'logout' %}" class="text-xs text-gray-500 hover:text-white mt-1 inline-block">↪️ Logout</a>
-      {% else %}
-        <div class="text-gray-300">👤 <b>Welcome, Guest</b></div>
-        <div class="mt-2 text-xs">
-          <a href="{% url 'login' %}" class="text-yellow-500 hover:underline">Sign In</a> | 
-          <a href="{% url 'signup' %}" class="text-gray-400 hover:underline">Register</a>
-        </div>
-      {% endif %}
+{% block content %}
+<!-- Search Header & Input Bar -->
+<div class="app-topbar" style="margin-bottom: 24px;">
+  <form action="{% url 'search' %}" method="get" class="search-form" style="max-width: 640px;" role="search">
+    <label for="search-page-input" class="sr-only">Search artists, tracks, or albums</label>
+    <div class="search-input-wrapper">
+      <span class="search-input-icon" aria-hidden="true">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+      </span>
+      <input 
+        type="search" 
+        id="search-page-input"
+        name="q" 
+        value="{{ query }}" 
+        class="search-input-field" 
+        placeholder="Search artists, songs, soundscapes..." 
+        aria-label="Search artists or tracks"
+        autofocus
+      >
+      <button type="submit" class="search-input-submit" aria-label="Submit search">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+      </button>
     </div>
+  </form>
+</div>
 
-    <!-- Nav Links -->
-    <div class="space-y-3 text-sm">
-      <a href="{% url 'home' %}" class="flex items-center text-gray-400 hover:text-white py-1">
-        <span class="mr-3">🏠</span> Home
-      </a>
-      <a href="{% url 'search' %}" class="flex items-center text-yellow-500 font-semibold py-1">
-        <span class="mr-3">🔍</span> Search
-      </a>
-    </div>
+<!-- Quick Suggestion Tags -->
+<div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 32px;">
+  <span style="font-size: var(--font-size-xs); font-weight: 700; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.05em; margin-right: 4px;">
+    Trending:
+  </span>
+  <a href="{% url 'search' %}?q=Burna+Boy" class="search-tag-chip">Burna Boy</a>
+  <a href="{% url 'search' %}?q=Asake" class="search-tag-chip">Asake</a>
+  <a href="{% url 'search' %}?q=Tems" class="search-tag-chip">Tems</a>
+  <a href="{% url 'search' %}?q=Rema" class="search-tag-chip">Rema</a>
+  <a href="{% url 'search' %}?q=Wizkid" class="search-tag-chip">Wizkid</a>
+  <a href="{% url 'search' %}?q=Ayra+Starr" class="search-tag-chip">Ayra Starr</a>
+  <a href="{% url 'search' %}?q=Amapiano" class="search-tag-chip">Amapiano</a>
+  <a href="{% url 'search' %}?q=Afrobeats" class="search-tag-chip">Afrobeats</a>
+</div>
+
+{% if query %}
+  <!-- Query Results Header -->
+  <div style="margin-bottom: 28px;">
+    <h1 style="font-size: var(--font-size-2xl); font-weight: 800; color: var(--text-primary); letter-spacing: -0.02em;">
+      Search results for <span style="color: var(--accent-gold);">"{{ query }}"</span>
+    </h1>
   </div>
 
-  <!-- Main Content -->
-  <div class="main-content">
-    <!-- Search Bar -->
-    <header class="mb-8">
-      <form action="{% url 'search' %}" method="get" class="relative inline-block">
-        <input 
-          type="search" 
-          name="q" 
-          value="{{ query }}" 
-          placeholder="Search artists, songs on Spotify..." 
-          class="search-input"
-          autofocus
-        >
-        <button type="submit" class="absolute right-3 top-2.5 text-gray-400 hover:text-yellow-500">
-          🔍
-        </button>
-      </form>
-    </header>
-
-    {% if query %}
-      <!-- Artists Section -->
-      {% if artists %}
-        <section class="mb-10">
-          <h2 class="text-xl font-bold mb-4 text-white">Artists</h2>
-          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-            {% for artist in artists %}
-              <a href="{% if artist.id %}{% url 'profile' artist.id %}{% else %}#{% endif %}" class="bg-gray-900 hover:bg-gray-800 p-4 rounded-lg text-center transition duration-200 group block">
-                <img 
-                  src="{{ artist.image_url }}" 
-                  alt="{{ artist.name }}" 
-                  class="w-28 h-28 mx-auto rounded-full object-cover mb-3 shadow group-hover:scale-105 transition transform duration-200"
-                >
-                <div class="font-semibold text-white text-sm truncate">{{ artist.name }}</div>
-                <div class="text-xs text-gray-400 mt-1">Artist</div>
-              </a>
-            {% endfor %}
-          </div>
-        </section>
-      {% endif %}
-
-      <!-- Tracks Section -->
-      {% if tracks %}
-        <section class="mb-10">
-          <h2 class="text-xl font-bold mb-4 text-white">Songs</h2>
-          <div class="bg-gray-900 rounded-lg divide-y divide-gray-800">
-            {% for track in tracks %}
-              <div class="flex items-center justify-between p-3 hover:bg-gray-800 transition rounded">
-                <div class="flex items-center space-x-3 overflow-hidden">
-                  <img src="{{ track.image_url }}" alt="{{ track.name }}" class="w-12 h-12 rounded object-cover flex-shrink-0">
-                  <div class="truncate">
-                    <div class="font-medium text-white text-sm truncate">{{ track.name }}</div>
-                    <div class="text-xs text-gray-400 truncate">
-                      {% if track.artist_id %}
-                        <a href="{% url 'profile' track.artist_id %}" class="hover:text-yellow-400 hover:underline">{{ track.artist_name }}</a>
-                      {% else %}
-                        {{ track.artist_name }}
-                      {% endif %}
-                      {% if track.album_name %} • {{ track.album_name }}{% endif %}
-                    </div>
-                  </div>
-                </div>
-                <div class="text-xs text-gray-400 ml-4 flex-shrink-0">
-                  {{ track.duration }}
-                </div>
-              </div>
-            {% endfor %}
-          </div>
-        </section>
-      {% endif %}
-
-      {% if not artists and not tracks %}
-        <div class="text-center py-20 text-gray-500">
-          <p class="text-lg">No results found on Spotify for "{{ query }}"</p>
-          <p class="text-xs mt-2">Try searching for an artist like "Burna Boy", "Asake", or "Rema"</p>
-        </div>
-      {% endif %}
-
-    {% else %}
-      <!-- Initial Empty State -->
-      <div class="text-center py-24 text-gray-500">
-        <div class="text-5xl mb-4">🎵</div>
-        <h3 class="text-xl font-semibold text-gray-300">Search Spotify Database</h3>
-        <p class="text-sm mt-2 text-gray-400">Discover millions of artists, albums, and tracks powered by Spotify via RapidAPI</p>
-        <div class="mt-6 flex justify-center space-x-2">
-          <a href="{% url 'search' %}?q=Burna+Boy" class="bg-gray-800 hover:bg-gray-700 text-xs px-3 py-1.5 rounded-full text-gray-300">Burna Boy</a>
-          <a href="{% url 'search' %}?q=Wizkid" class="bg-gray-800 hover:bg-gray-700 text-xs px-3 py-1.5 rounded-full text-gray-300">Wizkid</a>
-          <a href="{% url 'search' %}?q=Asake" class="bg-gray-800 hover:bg-gray-700 text-xs px-3 py-1.5 rounded-full text-gray-300">Asake</a>
-          <a href="{% url 'search' %}?q=Tems" class="bg-gray-800 hover:bg-gray-700 text-xs px-3 py-1.5 rounded-full text-gray-300">Tems</a>
+  <!-- Artists Results Section -->
+  {% if artists %}
+    <section style="margin-bottom: 40px;" aria-labelledby="artists-results-title">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title" id="artists-results-title">Artists</h2>
+          <p class="section-subtitle">Matching performers and creators</p>
         </div>
       </div>
-    {% endif %}
 
+      <div class="artist-grid">
+        {% for artist in artists %}
+          <a href="{% if artist.id %}{% url 'profile' artist.id %}{% else %}#{% endif %}" class="artist-card-item">
+            <div class="artist-avatar-wrapper">
+              <img 
+                src="{{ artist.image_url }}" 
+                alt="{{ artist.name }}" 
+                class="artist-avatar-img"
+                loading="lazy"
+              >
+            </div>
+            <div class="artist-card-name">{{ artist.name }}</div>
+            <div class="artist-card-role">Artist</div>
+          </a>
+        {% endfor %}
+      </div>
+    </section>
+  {% endif %}
+
+  <!-- Tracks Results Section -->
+  {% if tracks %}
+    <section style="margin-bottom: 40px;" aria-labelledby="tracks-results-title">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title" id="tracks-results-title">Songs & Tracks</h2>
+          <p class="section-subtitle">Play instantly in high fidelity</p>
+        </div>
+      </div>
+
+      <div class="track-list-card" role="region" aria-label="Search track results">
+        {% for track in tracks %}
+          <div class="track-row-item">
+            <span class="track-number">{{ forloop.counter }}</span>
+            <img 
+              src="{{ track.image_url }}" 
+              alt="{{ track.name }} album artwork" 
+              class="track-thumb-img"
+              loading="lazy"
+            >
+            <div class="track-meta">
+              <div class="track-title">{{ track.name }}</div>
+              <div class="track-artists-album">
+                {% if track.artist_id %}
+                  <a href="{% url 'profile' track.artist_id %}" class="track-artist-link">{{ track.artist_name }}</a>
+                {% else %}
+                  <span>{{ track.artist_name }}</span>
+                {% endif %}
+                {% if track.album_name %} • {{ track.album_name }}{% endif %}
+              </div>
+            </div>
+
+            <button 
+              type="button" 
+              class="track-play-trigger" 
+              aria-label="Play {{ track.name }} by {{ track.artist_name }}"
+              onclick="playTrack({ name: '{{ track.name|escapejs }}', artist: '{{ track.artist_name|escapejs }}', image: '{{ track.image_url|escapejs }}', duration: '{{ track.duration|escapejs }}' })"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+              </svg>
+            </button>
+
+            <span class="track-duration">{{ track.duration }}</span>
+          </div>
+        {% endfor %}
+      </div>
+    </section>
+  {% endif %}
+
+  <!-- No Results Found State -->
+  {% if not artists and not tracks %}
+    <div style="text-align: center; padding: 64px 20px; background: var(--bg-surface-elevated); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); margin-bottom: 40px;">
+      <div style="width: 64px; height: 64px; border-radius: var(--radius-full); background: var(--bg-surface-highlight); display: flex; align-items: center; justify-content: center; margin: 0 auto 18px; color: var(--accent-gold);">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          <line x1="8" y1="11" x2="14" y2="11"></line>
+        </svg>
+      </div>
+      <h2 style="font-size: var(--font-size-xl); font-weight: 800; color: var(--text-primary); margin-bottom: 8px;">No results found for "{{ query }}"</h2>
+      <p style="font-size: var(--font-size-sm); color: var(--text-muted); max-width: 440px; margin: 0 auto 24px;">
+        Please check spelling or try exploring another artist, genre, or track keyword.
+      </p>
+      <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
+        <a href="{% url 'search' %}?q=Afrobeats" class="btn btn-secondary">Try "Afrobeats"</a>
+        <a href="{% url 'search' %}?q=Amapiano" class="btn btn-secondary">Try "Amapiano"</a>
+        <a href="{% url 'search' %}?q=Burna+Boy" class="btn btn-secondary">Try "Burna Boy"</a>
+      </div>
+    </div>
+  {% endif %}
+
+{% else %}
+  <!-- Initial Empty Search State -->
+  <div style="text-align: center; padding: 80px 24px; background: var(--bg-surface-elevated); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg);">
+    <div style="width: 72px; height: 72px; border-radius: var(--radius-full); background: linear-gradient(135deg, var(--accent-gold-muted), var(--accent-plum-muted)); display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; color: var(--accent-gold);">
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M9 18V5l12-2v13"></path>
+        <circle cx="6" cy="18" r="3"></circle>
+        <circle cx="18" cy="16" r="3"></circle>
+      </svg>
+    </div>
+    <h2 style="font-size: var(--font-size-2xl); font-weight: 800; color: var(--text-primary); margin-bottom: 8px;">Discover Global Soundscapes</h2>
+    <p style="font-size: var(--font-size-base); color: var(--text-muted); max-width: 520px; margin: 0 auto 28px;">
+      Type an artist name, song title, or genre above to instantly search millions of catalog releases.
+    </p>
+    <div style="display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
+      <a href="{% url 'search' %}?q=Asake" class="btn btn-primary">Discover Asake</a>
+      <a href="{% url 'search' %}?q=Tems" class="btn btn-secondary">Discover Tems</a>
+      <a href="{% url 'search' %}?q=Highlife" class="btn btn-secondary">Explore Highlife</a>
+    </div>
   </div>
-
-</body>
-</html>
+{% endif %}
+{% endblock %}

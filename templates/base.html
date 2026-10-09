@@ -1,0 +1,467 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Kora - Modern music streaming and discovery experience celebrating African and global sounds.">
+  <title>{% block title %}Kora - Music Player & Discovery{% endblock %}</title>
+
+  <!-- Favicons -->
+  <link rel="icon" type="image/x-icon" href="{% static 'favicon.ico' %}">
+  <link rel="icon" type="image/png" sizes="32x32" href="{% static 'favicon-32x32.png' %}">
+  <link rel="icon" type="image/png" sizes="16x16" href="{% static 'favicon-16x16.png' %}">
+  <link rel="apple-touch-icon" sizes="180x180" href="{% static 'apple-touch-icon.png' %}">
+
+  <!-- Master Stylesheet -->
+  <link rel="stylesheet" href="{% static 'style.css' %}">
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+  <!-- Accessible Skip Link -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <!-- Mobile Top Header -->
+  <header class="mobile-header" role="banner">
+    <a href="{% url 'home' %}" class="mobile-header-brand" aria-label="Kora Home">
+      <img src="{% static 'kora_logo.png' %}" alt="Kora Logo" onerror="this.style.display='none'">
+      <span class="brand-name">Kora</span>
+    </a>
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <a href="{% url 'search' %}" class="btn-icon" aria-label="Search">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+      </a>
+      <button type="button" class="mobile-menu-btn" id="mobile-menu-toggle" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="mobile-drawer">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Mobile Navigation Drawer & Backdrop -->
+  <div class="mobile-drawer-backdrop" id="drawer-backdrop" aria-hidden="true"></div>
+  <nav class="mobile-drawer" id="mobile-drawer" aria-label="Mobile Navigation" aria-hidden="true">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+      <div class="brand-link">
+        <img src="{% static 'kora_logo.png' %}" alt="Kora Logo" style="height: 32px;" onerror="this.style.display='none'">
+        <span class="brand-name">Kora</span>
+      </div>
+      <button type="button" class="btn-icon" id="drawer-close-btn" aria-label="Close menu">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <!-- User Status -->
+    <div class="sidebar-user-card">
+      <div class="user-info-row">
+        <div class="user-avatar-badge" aria-hidden="true">
+          {% if request.user.is_authenticated %}{{ request.user.username|slice:":1"|upper }}{% else %}G{% endif %}
+        </div>
+        <div>
+          <div class="user-greeting">Welcome</div>
+          <div class="user-name">{% if request.user.is_authenticated %}{{ request.user.username }}{% else %}Guest Listener{% endif %}</div>
+        </div>
+      </div>
+      <div class="user-actions">
+        {% if request.user.is_authenticated %}
+          <a href="{% url 'logout' %}" class="user-logout-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+              <polyline points="16 17 21 12 16 7"></polyline>
+              <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+            Sign Out
+          </a>
+        {% else %}
+          <a href="{% url 'login' %}" class="user-auth-link">Sign In</a>
+          <span style="color: var(--text-dim);">•</span>
+          <a href="{% url 'signup' %}" class="user-auth-link" style="color: var(--text-secondary);">Register</a>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Navigation Links -->
+    <div class="sidebar-nav-section">
+      <div class="nav-section-title">Menu</div>
+      <a href="{% url 'home' %}" class="nav-link-item {% block nav_home_mobile %}{% endblock %}">
+        <span class="nav-icon" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+        </span>
+        Home
+      </a>
+      <a href="{% url 'search' %}" class="nav-link-item {% block nav_search_mobile %}{% endblock %}">
+        <span class="nav-icon" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        </span>
+        Search & Discover
+      </a>
+    </div>
+
+    <!-- Quick Vibes Playlist -->
+    <div class="sidebar-nav-section">
+      <div class="nav-section-title">Soundscapes</div>
+      <div class="sidebar-playlists">
+        <a href="{% url 'search' %}?q=Afrobeats" class="playlist-link">
+          <span class="playlist-dot" style="background-color: #f59e0b;" aria-hidden="true"></span>
+          Afrobeat Essentials
+        </a>
+        <a href="{% url 'search' %}?q=Amapiano" class="playlist-link">
+          <span class="playlist-dot" style="background-color: #8b5cf6;" aria-hidden="true"></span>
+          Amapiano Heat
+        </a>
+        <a href="{% url 'search' %}?q=Highlife" class="playlist-link">
+          <span class="playlist-dot" style="background-color: #10b981;" aria-hidden="true"></span>
+          Highlife Classics
+        </a>
+        <a href="{% url 'search' %}?q=African+Lofi" class="playlist-link">
+          <span class="playlist-dot" style="background-color: #3b82f6;" aria-hidden="true"></span>
+          African Lofi Chill
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Application Layout -->
+  <div class="app-layout">
+    <!-- Desktop Sidebar -->
+    <aside class="app-sidebar" aria-label="Main Navigation">
+      <div class="sidebar-brand">
+        <a href="{% url 'home' %}" class="brand-link" aria-label="Kora Home">
+          <img src="{% static 'kora_logo.png' %}" alt="Kora Logo" class="brand-logo-img" onerror="this.style.display='none'">
+          <span class="brand-name">Kora</span>
+        </a>
+      </div>
+
+      <!-- User Status Card -->
+      <div class="sidebar-user-card">
+        <div class="user-info-row">
+          <div class="user-avatar-badge" aria-hidden="true">
+            {% if request.user.is_authenticated %}{{ request.user.username|slice:":1"|upper }}{% else %}G{% endif %}
+          </div>
+          <div>
+            <div class="user-greeting">Welcome</div>
+            <div class="user-name">{% if request.user.is_authenticated %}{{ request.user.username }}{% else %}Guest Listener{% endif %}</div>
+          </div>
+        </div>
+        <div class="user-actions">
+          {% if request.user.is_authenticated %}
+            <a href="{% url 'logout' %}" class="user-logout-btn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+              </svg>
+              Sign Out
+            </a>
+          {% else %}
+            <a href="{% url 'login' %}" class="user-auth-link">Sign In</a>
+            <span style="color: var(--text-dim);" aria-hidden="true">•</span>
+            <a href="{% url 'signup' %}" class="user-auth-link" style="color: var(--text-secondary);">Register</a>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Navigation Links -->
+      <div class="sidebar-nav-section">
+        <div class="nav-section-title">Menu</div>
+        <a href="{% url 'home' %}" class="nav-link-item {% block nav_home %}{% endblock %}">
+          <span class="nav-icon" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+          </span>
+          Home
+        </a>
+        <a href="{% url 'search' %}" class="nav-link-item {% block nav_search %}{% endblock %}">
+          <span class="nav-icon" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          </span>
+          Search & Discover
+        </a>
+      </div>
+
+      <!-- Playlists & Soundscapes -->
+      <div class="sidebar-nav-section" style="margin-top: auto;">
+        <div class="nav-section-title">Soundscapes</div>
+        <div class="sidebar-playlists">
+          <a href="{% url 'search' %}?q=Afrobeats" class="playlist-link">
+            <span class="playlist-dot" style="background-color: #f59e0b;" aria-hidden="true"></span>
+            Afrobeat Essentials
+          </a>
+          <a href="{% url 'search' %}?q=Amapiano" class="playlist-link">
+            <span class="playlist-dot" style="background-color: #8b5cf6;" aria-hidden="true"></span>
+            Amapiano Heat
+          </a>
+          <a href="{% url 'search' %}?q=Highlife" class="playlist-link">
+            <span class="playlist-dot" style="background-color: #10b981;" aria-hidden="true"></span>
+            Highlife Classics
+          </a>
+          <a href="{% url 'search' %}?q=African+Lofi" class="playlist-link">
+            <span class="playlist-dot" style="background-color: #3b82f6;" aria-hidden="true"></span>
+            African Lofi Chill
+          </a>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div class="app-main">
+      <main id="main-content" class="main-container">
+        <!-- Django Notification Messages -->
+        {% if messages %}
+          <div class="alert-container" role="status" aria-live="polite">
+            {% for message in messages %}
+              <div class="alert-banner {% if message.tags == 'error' %}alert-error{% elif message.tags == 'success' %}alert-success{% else %}alert-info{% endif %}">
+                <span aria-hidden="true">
+                  {% if message.tags == 'error' %}
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                  {% elif message.tags == 'success' %}
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                  {% else %}
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                  {% endif %}
+                </span>
+                <span>{{ message }}</span>
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        {% block content %}{% endblock %}
+      </main>
+    </div>
+  </div>
+
+  <!-- Mobile Bottom Quick Navigation -->
+  <nav class="mobile-bottom-nav" aria-label="Mobile Bottom Navigation">
+    <a href="{% url 'home' %}" class="mobile-nav-tab {% block nav_home_tab %}{% endblock %}">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+      Home
+    </a>
+    <a href="{% url 'search' %}" class="mobile-nav-tab {% block nav_search_tab %}{% endblock %}">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+      Search
+    </a>
+    {% if request.user.is_authenticated %}
+      <a href="{% url 'logout' %}" class="mobile-nav-tab">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+        Sign Out
+      </a>
+    {% else %}
+      <a href="{% url 'login' %}" class="mobile-nav-tab">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+        Sign In
+      </a>
+    {% endif %}
+  </nav>
+
+  <!-- Persistent Bottom Player Dock -->
+  <aside class="player-dock" id="global-player-dock" aria-label="Audio Player">
+    <!-- Left: Track Details -->
+    <div class="player-track-info">
+      <img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=150&auto=format&fit=crop&q=80" alt="Album artwork" class="player-cover-art" id="player-artwork" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2252%22 height=%2252%22 fill=%22%23212634%22><rect width=%2252%22 height=%2252%22/><text x=%2250%%22 y=%2250%%22 fill=%22%2394a3b8%22 font-size=%2220%22 text-anchor=%22middle%22 dy=%22.3em%22>♪</text></svg>'">
+      <div class="player-meta-details">
+        <div class="player-track-name" id="player-track-title">African Lofi Experience</div>
+        <div class="player-artist-name" id="player-track-artist">Kora Sounds</div>
+      </div>
+    </div>
+
+    <!-- Center: Playback Controls & Progress -->
+    <div class="player-controls-container">
+      <div class="player-buttons-row">
+        <button type="button" class="player-btn" id="player-prev-btn" aria-label="Previous track">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <polygon points="19 20 9 12 19 4 19 20"></polygon>
+            <line x1="5" y1="19" x2="5" y2="5" stroke="currentColor" stroke-width="2"></line>
+          </svg>
+        </button>
+
+        <button type="button" class="player-btn player-play-btn" id="player-play-btn" aria-label="Play track">
+          <svg id="play-icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+          </svg>
+          <svg id="pause-icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="display: none;" aria-hidden="true">
+            <rect x="6" y="4" width="4" height="16"></rect>
+            <rect x="14" y="4" width="4" height="16"></rect>
+          </svg>
+        </button>
+
+        <button type="button" class="player-btn" id="player-next-btn" aria-label="Next track">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <polygon points="5 4 15 12 5 20 5 4"></polygon>
+            <line x1="19" y1="5" x2="19" y2="19" stroke="currentColor" stroke-width="2"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="player-progress-row">
+        <span class="player-time-current" id="player-current-time">0:00</span>
+        <div class="player-progress-bar" id="player-progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0" aria-label="Track playback position">
+          <div class="player-progress-fill" id="player-progress-fill" style="width: 0%;"></div>
+        </div>
+        <span class="player-time-total" id="player-total-time">3:45</span>
+      </div>
+    </div>
+
+    <!-- Right: Volume Controls -->
+    <div class="player-extra-controls">
+      <div class="volume-slider-wrapper">
+        <button type="button" class="player-btn" id="volume-toggle-btn" aria-label="Mute or unmute">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+          </svg>
+        </button>
+        <input type="range" min="0" max="100" value="75" class="volume-range-input" id="volume-slider" aria-label="Volume level">
+      </div>
+    </div>
+
+    <!-- Hidden audio element for preview playback -->
+    <audio id="global-audio" preload="none"></audio>
+  </aside>
+
+  <!-- Global Application Scripts -->
+  <script>
+    (function() {
+      // Mobile Navigation Drawer Toggle
+      const toggleBtn = document.getElementById('mobile-menu-toggle');
+      const closeBtn = document.getElementById('drawer-close-btn');
+      const drawer = document.getElementById('mobile-drawer');
+      const backdrop = document.getElementById('drawer-backdrop');
+
+      function openDrawer() {
+        if (!drawer || !backdrop) return;
+        drawer.classList.add('open');
+        backdrop.classList.add('open');
+        drawer.setAttribute('aria-hidden', 'false');
+        if (toggleBtn) toggleBtn.setAttribute('aria-expanded', 'true');
+      }
+
+      function closeDrawer() {
+        if (!drawer || !backdrop) return;
+        drawer.classList.remove('open');
+        backdrop.classList.remove('open');
+        drawer.setAttribute('aria-hidden', 'true');
+        if (toggleBtn) toggleBtn.setAttribute('aria-expanded', 'false');
+      }
+
+      if (toggleBtn) toggleBtn.addEventListener('click', openDrawer);
+      if (closeBtn) closeBtn.addEventListener('click', closeDrawer);
+      if (backdrop) backdrop.addEventListener('click', closeDrawer);
+
+      // Close drawer on escape key
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && drawer && drawer.classList.contains('open')) {
+          closeDrawer();
+        }
+      });
+
+      // Global Player Controller
+      const playBtn = document.getElementById('player-play-btn');
+      const playIcon = document.getElementById('play-icon');
+      const pauseIcon = document.getElementById('pause-icon');
+      const titleElem = document.getElementById('player-track-title');
+      const artistElem = document.getElementById('player-track-artist');
+      const artworkElem = document.getElementById('player-artwork');
+      const progressFill = document.getElementById('player-progress-fill');
+      const progressTrack = document.getElementById('player-progress-track');
+      const currentTimeElem = document.getElementById('player-current-time');
+      const totalTimeElem = document.getElementById('player-total-time');
+      const audio = document.getElementById('global-audio');
+
+      let isPlaying = false;
+      let progressInterval = null;
+      let currentProgressPercent = 0;
+      let playbackSeconds = 0;
+      let totalSeconds = 210;
+
+      function formatTime(secs) {
+        const m = Math.floor(secs / 60);
+        const s = Math.floor(secs % 60);
+        return m + ':' + (s < 10 ? '0' : '') + s;
+      }
+
+      function updatePlayState(playing) {
+        isPlaying = playing;
+        if (playIcon && pauseIcon) {
+          playIcon.style.display = playing ? 'none' : 'block';
+          pauseIcon.style.display = playing ? 'block' : 'none';
+        }
+        if (playBtn) {
+          playBtn.setAttribute('aria-label', playing ? 'Pause track' : 'Play track');
+        }
+
+        if (playing) {
+          if (progressInterval) clearInterval(progressInterval);
+          progressInterval = setInterval(function() {
+            playbackSeconds += 1;
+            if (playbackSeconds > totalSeconds) playbackSeconds = 0;
+            currentProgressPercent = (playbackSeconds / totalSeconds) * 100;
+            if (progressFill) progressFill.style.width = currentProgressPercent + '%';
+            if (currentTimeElem) currentTimeElem.textContent = formatTime(playbackSeconds);
+            if (progressTrack) progressTrack.setAttribute('aria-valuenow', Math.round(currentProgressPercent));
+          }, 1000);
+        } else {
+          if (progressInterval) clearInterval(progressInterval);
+        }
+      }
+
+      if (playBtn) {
+        playBtn.addEventListener('click', function() {
+          updatePlayState(!isPlaying);
+        });
+      }
+
+      // Seek on progress bar click
+      if (progressTrack) {
+        progressTrack.addEventListener('click', function(e) {
+          const rect = progressTrack.getBoundingClientRect();
+          const clickX = e.clientX - rect.left;
+          const ratio = Math.max(0, Math.min(1, clickX / rect.width));
+          playbackSeconds = Math.round(ratio * totalSeconds);
+          currentProgressPercent = ratio * 100;
+          if (progressFill) progressFill.style.width = currentProgressPercent + '%';
+          if (currentTimeElem) currentTimeElem.textContent = formatTime(playbackSeconds);
+        });
+      }
+
+      // Public API to trigger playing a selected track from cards/rows
+      window.playTrack = function(data) {
+        if (!data) return;
+        if (titleElem && data.name) titleElem.textContent = data.name;
+        if (artistElem && data.artist) artistElem.textContent = data.artist;
+        if (artworkElem && data.image) {
+          artworkElem.src = data.image;
+        }
+        if (data.duration) {
+          if (totalTimeElem) totalTimeElem.textContent = data.duration;
+          const parts = data.duration.split(':');
+          if (parts.length === 2) {
+            totalSeconds = (parseInt(parts[0], 10) || 3) * 60 + (parseInt(parts[1], 10) || 30);
+          }
+        }
+        playbackSeconds = 0;
+        updatePlayState(true);
+      };
+
+      // Image Fallback Handler for any broken images
+      document.addEventListener('error', function(e) {
+        if (e.target && e.target.tagName === 'IMG') {
+          if (!e.target.dataset.hasFallback) {
+            e.target.dataset.hasFallback = 'true';
+            e.target.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" fill="%231a1e2b"><rect width="200" height="200"/><circle cx="100" cy="100" r="40" fill="%232b3145"/><text x="100" y="105" fill="%23e5a93b" font-family="sans-serif" font-size="28" font-weight="bold" text-anchor="middle">♪</text></svg>';
+          }
+        }
+      }, true);
+    })();
+  </script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

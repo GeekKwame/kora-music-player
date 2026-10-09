@@ -1,243 +1,286 @@
+{% extends 'base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kora - Music Streaming</title>
-    <link rel="icon" type="image/x-icon" href="{% static 'favicon.ico' %}">
-    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'favicon-32x32.png' %}">
-    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'favicon-16x16.png' %}">
-    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'apple-touch-icon.png' %}">
-    <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}" />
-</head>
-<body style="margin:0; padding:0; background:#121212; font-family:Arial, sans-serif; color:#fff;">
-    <div class="sidebar">
-        <!-- Kora Logo -->
-        <div class="logo-container" style="text-align: center; margin-bottom: 20px;">
-            <img src="{% static 'kora_logo.png' %}" alt="Kora Logo" style="max-width: 180px; width: 100%; height: auto; display: block; margin: 0 auto;">
-        </div>
 
-        <!-- Welcome User -->
-        <div class="sidebar-section">
-            {% if request.user.is_authenticated %}
-                <span style="margin-left: 14px;" class="sidebar-link-icon">👤</span>
-                <b>Welcome, {{ request.user.username }}</b>
-                <br>
-                <br>
-                <a href="{% url 'logout' %}">
-                    <span class="sidebar-link-icon">↪️</span>
-                    <b>Logout</b>
-                </a>
-            {% else %}
-                <span style="margin-left: 14px;" class="sidebar-link-icon">👤</span>
-                <b>Welcome, Guest</b>
-                <br>
-                <br>
-                <a href="{% url 'login' %}" style="color: #e5a93b; text-decoration: none; margin-right: 8px;">
-                    <b>Sign In</b>
-                </a> | 
-                <a href="{% url 'signup' %}" style="color: #bbb; text-decoration: none; margin-left: 8px;">
-                    <b>Register</b>
-                </a>
-            {% endif %}
-        </div>
+{% block title %}Kora - Modern African & Global Soundscapes{% endblock %}
+{% block nav_home %}active{% endblock %}
+{% block nav_home_mobile %}active{% endblock %}
+{% block nav_home_tab %}active{% endblock %}
 
-        <!-- Top section of the sidebar -->
-        <div class="sidebar-section">
-            <a href="#" class="sidebar-link active">
-                <span class="sidebar-link-icon">🏠</span>
-                Home
-            </a>
-            <a href="{% url 'search' %}" class="sidebar-link">
-                <span class="sidebar-link-icon">🔍</span>
-                Search
-            </a>
-            <a href="#" class="sidebar-link">
-                <span class="sidebar-link-icon">🎵</span>
-                Your Library
-            </a>
-        </div>
-
-        <!-- Bottom section of the sidebar -->
-        <div class="sidebar-section">
-            <a href="#" class="sidebar-link active">
-                <span class="sidebar-link-icon">💜</span>
-                <span class="sidebar-link-text">Liked Songs</span>
-            </a>
-            <!-- Repeat for each item -->
-            <a href="#" class="sidebar-link">
-                <span class="sidebar-link-icon">🎶</span>
-                <span class="sidebar-link-text">African Lofi Experience</span>
-            </a>
-            <a href="#" class="sidebar-link">
-                <span class="sidebar-link-icon">👤</span>
-                <span class="sidebar-link-text">Ayra Starr</span>
-            </a>
-            <!-- ... more links ... -->
-        </div>
+{% block content %}
+<!-- Topbar: Quick Search & Status -->
+<div class="app-topbar">
+  <form action="{% url 'search' %}" method="get" class="search-form" role="search">
+    <label for="home-search-input" class="sr-only">Search artists or tracks</label>
+    <div class="search-input-wrapper">
+      <span class="search-input-icon" aria-hidden="true">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+      </span>
+      <input 
+        type="search" 
+        id="home-search-input"
+        name="q" 
+        class="search-input-field" 
+        placeholder="What do you want to listen to today?" 
+        aria-label="Search music, artists or albums"
+      >
+      <button type="submit" class="search-input-submit" aria-label="Submit search">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+      </button>
     </div>
+  </form>
 
-    <div style="margin-left:240px; padding:20px;">
-        {% if messages %}
-            <div style="margin-bottom: 20px;">
-                {% for message in messages %}
-                    <div style="padding: 10px 15px; border-radius: 6px; font-size: 14px; margin-bottom: 10px; {% if message.tags == 'error' %}background-color: #5c1d1d; color: #ffbaba;{% elif message.tags == 'success' %}background-color: #1b4d2e; color: #c3e6cb;{% else %}background-color: #4a3e1b; color: #ffeeba;{% endif %}">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-            </div>
-        {% endif %}
-        <header class="header-container">
-            <form action="{% url 'search' %}" method="get" class="search-bar" style="width: 390px; display: flex; align-items: center;">
-                <input type="search" name="q" placeholder="What do you want to listen to?" aria-label="Search" style="width: 100%; border: none; background: transparent; color: #fff; outline: none; padding: 6px 10px;">
-                <button type="submit" aria-label="Search" style="background: none; border: none; cursor: pointer; color: #fff; padding: 6px;">
-                    🔍
-                </button>
-            </form>
-            <div class="search-title">Top Artists</div>
-        </header>
+  <div style="display: flex; align-items: center; gap: 12px;">
+    {% if not request.user.is_authenticated %}
+      <a href="{% url 'login' %}" class="btn btn-ghost" style="padding: 8px 16px;">Sign In</a>
+      <a href="{% url 'signup' %}" class="btn btn-primary" style="padding: 8px 18px;">Get Started</a>
+    {% else %}
+      <div style="font-size: var(--font-size-xs); color: var(--text-muted); background: var(--bg-surface-elevated); padding: 8px 14px; border-radius: var(--radius-full); border: 1px solid var(--border-subtle);">
+        ⚡ High-Fidelity Audio Active
+      </div>
+    {% endif %}
+  </div>
+</div>
 
+<!-- Hero Editorial Feature -->
+<section class="hero-banner" aria-labelledby="hero-heading">
+  <div class="hero-tag">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+    </svg>
+    Editorial Spotlight
+  </div>
+  <h1 class="hero-title" id="hero-heading">Rhythms of the Motherland, Elevated.</h1>
+  <p class="hero-desc">Immerse yourself in handpicked Afrobeats, Amapiano pulses, and acoustic African warmth—crafted for true music discovery.</p>
+  <div class="hero-actions">
+    <a href="{% url 'search' %}?q=Afrobeats" class="btn btn-primary">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <polygon points="5 3 19 12 5 21 5 3"></polygon>
+      </svg>
+      Listen to Afrobeat Essentials
+    </a>
+    <a href="{% url 'search' %}?q=Amapiano" class="btn btn-secondary">
+      Explore Amapiano Heat
+    </a>
+  </div>
+</section>
 
-        <main style="padding-top:20px;">
-            <section style="margin-top:0px; padding:0px; overflow-x:auto; white-space:nowrap;">
-                {% if featured_artists %}
-                    {% for artist in featured_artists %}
-                        <a href="{% url 'profile' artist.id %}" class="artist-card" style="text-decoration: none; color: inherit; display: inline-block;">
-                            <img src="{{ artist.image_url }}" alt="{{ artist.name }}" style="width:150px; height:150px; border-radius:50%; object-fit: cover;">
-                            <div class="artist-info">
-                                <div class="artist-name" style="max-width: 150px; overflow: hidden; text-overflow: ellipsis;">{{ artist.name }}</div>
-                                <div class="artist-title">Artist</div>
-                            </div>
-                        </a>
-                    {% endfor %}
-                {% else %}
-                    <!-- Default fallback -->
-                    <div class="artist-card">
-                        <img src="https://i.scdn.co/image/ab676161000051747952358e33599027ae3c7f37" alt="Rema" style="width:150px; height:150px; border-radius:50%; object-fit: cover;">
-                        <div class="artist-info">
-                            <div class="artist-name">Rema</div>
-                            <div class="artist-title">Artist</div>
-                        </div>
-                    </div>
-                {% endif %}
-            </section>
-            <!-- Repeat sections for other categories with more content cards -->
-          
-          <!-- "Browse All" Section Title -->
-          <div class="browse-all-title">Browse all</div>
-
-          <!-- "Browse All" Section Content -->
-          
-
-          <div class="browse-all">
-            <!-- Category Card -->
-            <div class="category-card">
-                <img src="https://i.scdn.co/image/ab6765630000ba8a81f07e1ead0317ee3c285bfa" alt="Podcasts">
-                <div class="category-title">Podcasts</div>
-            </div>
-
-            <div class="category-card">
-              <img src="https://i.scdn.co/image/ab67fb8200005cafa6152f62518b4c3251858b21" alt="Podcasts">
-              <div class="category-title">Audiobooks</div>
-            </div>
-
-            <div class="category-card">
-              <img src="https://concerts.spotifycdn.com/images/live-events_category-image.jpg" alt="Podcasts">
-              <div class="category-title">Live Events</div>
-            </div>
-
-            <div class="category-card">
-              <img src="https://t.scdn.co/images/ea364e99656e46a096ea1df50f581efe" alt="Podcasts">
-              <div class="category-title">Made For You</div>
-            </div>
-
-            <div class="category-card">
-              <img src="https://i.scdn.co/image/ab67706f000000027ea4d505212b9de1f72c5112" alt="Podcasts">
-              <div class="category-title">New Releases</div>
-            </div>
-
-            <div class="category-card">
-              <img src="https://i.scdn.co/image/ab67fb8200005caf585ad0e83caae5047865f7a4" alt="Podcasts">
-              <div class="category-title">2023 in Music</div>
-            </div>
-            <!-- Repeat for each category -->
-            <!-- ... other categories ... -->
-        </div>
-
-        <div class="browse-all">
-            <!-- Category Card -->
-            <div class="category-card">
-                <img src="https://i.scdn.co/image/ab67fb8200008e2cea38d17f2e1a1630287f4328" alt="Podcasts">
-                <div class="category-title">2023 in podcasts</div>
-            </div>
-
-            <div class="category-card">
-              <img src="https://i.scdn.co/image/ab6761700000c52c87ab6b4a0c51593853fe2157" alt="Podcasts">
-              <div class="category-title">Merch</div>
-            </div>
-
-            <div class="category-card">
-              <img src="https://i.scdn.co/image/ab67fb8200008e2c64adf130003faa51378e3d2b" alt="Podcasts">
-              <div class="category-title">Happy Christmas</div>
-            </div>
-
-            <div class="category-card">
-              <img src="https://i.scdn.co/image/ab67fb8200005cafa862ab80dd85682b37c4e768" alt="Podcasts">
-              <div class="category-title">Pop</div>
-            </div>
-
-            <div class="category-card">
-              <img src="https://i.scdn.co/image/ab67fb8200005caf271f9d895003c5f5561c1354" alt="Podcasts">
-              <div class="category-title">Mood</div>
-            </div>
-
-            <div class="category-card">
-              <img src="https://i.scdn.co/image/ab67fb8200005caf9e3dea60be755ccd97b7351f" alt="Podcasts">
-              <div class="category-title">Hip-Hop</div>
-            </div>
-            <!-- Repeat for each category -->
-            <!-- ... other categories ... -->
-        </div>
-
-        <div class="browse-all">
-            <!-- Category Card -->
-            <div class="category-card">
-                <img src="https://t.scdn.co/images/7262179db37c498480ef06bfacb60310.jpeg" alt="Podcasts">
-                <div class="category-title">Podcast Charts</div>
-            </div>
-
-            <div class="category-card">
-              <img src="https://t.scdn.co/images/209c867f5bb34076b0dcc9deeb1868e6" alt="Podcasts">
-              <div class="category-title">Podcast New Releases</div>
-            </div>
-
-            <div class="category-card">
-              <img src="https://i.scdn.co/image/9af79fd06e34dea3cd27c4e1cd6ec7343ce20af4" alt="Podcasts">
-              <div class="category-title">Video Podcasts</div>
-            </div>
-
-            <div class="category-card">
-              <img src="https://i.scdn.co/image/ab67fb8200005caf3a75eafe6ba383e4152e6938" alt="Podcasts">
-              <div class="category-title">Fiction & Literature</div>
-            </div>
-
-            <div class="category-card">
-              <img src="https://charts-images.scdn.co/assets/locale_en/regional/weekly/region_global_default.jpg" alt="Podcasts">
-              <div class="category-title">Charts</div>
-            </div>
-
-            <div class="category-card">
-              <img src="https://i.scdn.co/image/ab67706f000000029249b35f23fb596b6f006a15" alt="Podcasts">
-              <div class="category-title">Workout</div>
-            </div>
-            <!-- Repeat for each category -->
-            <!-- ... other categories ... -->
-        </div>
-
-        </main>
-
+<!-- Section 1: Top Artists -->
+<section style="margin-bottom: 40px;" aria-labelledby="artists-heading">
+  <div class="section-header">
+    <div>
+      <h2 class="section-title" id="artists-heading">Featured Artists</h2>
+      <p class="section-subtitle">Pioneering voices shaping soundscapes across the continent</p>
     </div>
-    
-</body>
-</html>
+    <a href="{% url 'search' %}?q=African+Artists" class="section-link">View All</a>
+  </div>
+
+  <div class="artist-grid">
+    {% if featured_artists %}
+      {% for artist in featured_artists %}
+        <a href="{% if artist.id %}{% url 'profile' artist.id %}{% else %}#{% endif %}" class="artist-card-item">
+          <div class="artist-avatar-wrapper">
+            <img 
+              src="{{ artist.image_url }}" 
+              alt="{{ artist.name }}" 
+              class="artist-avatar-img"
+              loading="lazy"
+            >
+          </div>
+          <div class="artist-card-name">{{ artist.name }}</div>
+          <div class="artist-card-role">Artist</div>
+        </a>
+      {% endfor %}
+    {% else %}
+      <!-- Resilient curated fallback artists -->
+      <a href="{% url 'search' %}?q=Burna+Boy" class="artist-card-item">
+        <div class="artist-avatar-wrapper">
+          <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&auto=format&fit=crop&q=80" alt="Burna Boy" class="artist-avatar-img">
+        </div>
+        <div class="artist-card-name">Burna Boy</div>
+        <div class="artist-card-role">Artist</div>
+      </a>
+      <a href="{% url 'search' %}?q=Asake" class="artist-card-item">
+        <div class="artist-avatar-wrapper">
+          <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&auto=format&fit=crop&q=80" alt="Asake" class="artist-avatar-img">
+        </div>
+        <div class="artist-card-name">Asake</div>
+        <div class="artist-card-role">Artist</div>
+      </a>
+      <a href="{% url 'search' %}?q=Tems" class="artist-card-item">
+        <div class="artist-avatar-wrapper">
+          <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?w=300&auto=format&fit=crop&q=80" alt="Tems" class="artist-avatar-img">
+        </div>
+        <div class="artist-card-name">Tems</div>
+        <div class="artist-card-role">Artist</div>
+      </a>
+      <a href="{% url 'search' %}?q=Rema" class="artist-card-item">
+        <div class="artist-avatar-wrapper">
+          <img src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=300&auto=format&fit=crop&q=80" alt="Rema" class="artist-avatar-img">
+        </div>
+        <div class="artist-card-name">Rema</div>
+        <div class="artist-card-role">Artist</div>
+      </a>
+      <a href="{% url 'search' %}?q=Ayra+Starr" class="artist-card-item">
+        <div class="artist-avatar-wrapper">
+          <img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=300&auto=format&fit=crop&q=80" alt="Ayra Starr" class="artist-avatar-img">
+        </div>
+        <div class="artist-card-name">Ayra Starr</div>
+        <div class="artist-card-role">Artist</div>
+      </a>
+      <a href="{% url 'search' %}?q=Wizkid" class="artist-card-item">
+        <div class="artist-avatar-wrapper">
+          <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=300&auto=format&fit=crop&q=80" alt="Wizkid" class="artist-avatar-img">
+        </div>
+        <div class="artist-card-name">Wizkid</div>
+        <div class="artist-card-role">Artist</div>
+      </a>
+    {% endif %}
+  </div>
+</section>
+
+<!-- Section 2: Trending Tracks -->
+<section style="margin-bottom: 40px;" aria-labelledby="tracks-heading">
+  <div class="section-header">
+    <div>
+      <h2 class="section-title" id="tracks-heading">Trending Tracks</h2>
+      <p class="section-subtitle">Top songs in high rotation this week</p>
+    </div>
+    <a href="{% url 'search' %}?q=Top+Tracks" class="section-link">Discover More</a>
+  </div>
+
+  <div class="track-list-card" role="region" aria-label="Trending tracks list">
+    {% if featured_tracks %}
+      {% for track in featured_tracks %}
+        <div class="track-row-item">
+          <span class="track-number">{{ forloop.counter }}</span>
+          <img 
+            src="{{ track.image_url }}" 
+            alt="{{ track.name }} album art" 
+            class="track-thumb-img"
+            loading="lazy"
+          >
+          <div class="track-meta">
+            <div class="track-title">{{ track.name }}</div>
+            <div class="track-artists-album">
+              {% if track.artist_id %}
+                <a href="{% url 'profile' track.artist_id %}" class="track-artist-link">{{ track.artist_name }}</a>
+              {% else %}
+                <span>{{ track.artist_name }}</span>
+              {% endif %}
+              {% if track.album_name %} • {{ track.album_name }}{% endif %}
+            </div>
+          </div>
+
+          <button 
+            type="button" 
+            class="track-play-trigger" 
+            aria-label="Play {{ track.name }} by {{ track.artist_name }}"
+            onclick="playTrack({ name: '{{ track.name|escapejs }}', artist: '{{ track.artist_name|escapejs }}', image: '{{ track.image_url|escapejs }}', duration: '{{ track.duration|escapejs }}' })"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <polygon points="5 3 19 12 5 21 5 3"></polygon>
+            </svg>
+          </button>
+
+          <span class="track-duration">{{ track.duration }}</span>
+        </div>
+      {% endfor %}
+    {% else %}
+      <!-- Curated Track Fallbacks -->
+      <div class="track-row-item">
+        <span class="track-number">1</span>
+        <img src="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=120&auto=format&fit=crop&q=80" alt="Last Last album art" class="track-thumb-img">
+        <div class="track-meta">
+          <div class="track-title">Last Last</div>
+          <div class="track-artists-album">Burna Boy • Love, Damini</div>
+        </div>
+        <button type="button" class="track-play-trigger" aria-label="Play Last Last" onclick="playTrack({ name: 'Last Last', artist: 'Burna Boy', image: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=120&auto=format&fit=crop&q=80', duration: '2:52' })">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+        </button>
+        <span class="track-duration">2:52</span>
+      </div>
+      <div class="track-row-item">
+        <span class="track-number">2</span>
+        <img src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=120&auto=format&fit=crop&q=80" alt="Calm Down album art" class="track-thumb-img">
+        <div class="track-meta">
+          <div class="track-title">Calm Down</div>
+          <div class="track-artists-album">Rema • Rave & Roses</div>
+        </div>
+        <button type="button" class="track-play-trigger" aria-label="Play Calm Down" onclick="playTrack({ name: 'Calm Down', artist: 'Rema', image: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=120&auto=format&fit=crop&q=80', duration: '3:39' })">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+        </button>
+        <span class="track-duration">3:39</span>
+      </div>
+      <div class="track-row-item">
+        <span class="track-number">3</span>
+        <img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=120&auto=format&fit=crop&q=80" alt="Lonely At The Top album art" class="track-thumb-img">
+        <div class="track-meta">
+          <div class="track-title">Lonely At The Top</div>
+          <div class="track-artists-album">Asake • Work of Art</div>
+        </div>
+        <button type="button" class="track-play-trigger" aria-label="Play Lonely At The Top" onclick="playTrack({ name: 'Lonely At The Top', artist: 'Asake', image: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=120&auto=format&fit=crop&q=80', duration: '2:37' })">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+        </button>
+        <span class="track-duration">2:37</span>
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+<!-- Section 3: Browse Genres & Curated Soundscapes -->
+<section aria-labelledby="genres-heading">
+  <div class="section-header">
+    <div>
+      <h2 class="section-title" id="genres-heading">Curated Soundscapes</h2>
+      <p class="section-subtitle">Explore genres, moods, and cultural expressions</p>
+    </div>
+  </div>
+
+  <div class="genres-grid">
+    <a href="{% url 'search' %}?q=Afrobeats" class="genre-card-link bg-vibe-afrobeats">
+      <div class="genre-name">Afrobeats</div>
+      <img src="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=150&auto=format&fit=crop&q=80" alt="Afrobeats art" class="genre-card-art" loading="lazy">
+    </a>
+
+    <a href="{% url 'search' %}?q=Amapiano" class="genre-card-link bg-vibe-amapiano">
+      <div class="genre-name">Amapiano</div>
+      <img src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=150&auto=format&fit=crop&q=80" alt="Amapiano art" class="genre-card-art" loading="lazy">
+    </a>
+
+    <a href="{% url 'search' %}?q=Highlife" class="genre-card-link bg-vibe-highlife">
+      <div class="genre-name">Highlife</div>
+      <img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=150&auto=format&fit=crop&q=80" alt="Highlife art" class="genre-card-art" loading="lazy">
+    </a>
+
+    <a href="{% url 'search' %}?q=African+Lofi" class="genre-card-link bg-vibe-lofi">
+      <div class="genre-name">African Lofi</div>
+      <img src="https://images.unsplash.com/photo-1518609878373-06d740f60d8b?w=150&auto=format&fit=crop&q=80" alt="African Lofi art" class="genre-card-art" loading="lazy">
+    </a>
+
+    <a href="{% url 'search' %}?q=Afro-Fusion" class="genre-card-link bg-vibe-fusion">
+      <div class="genre-name">Afro-Fusion</div>
+      <img src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=150&auto=format&fit=crop&q=80" alt="Afro Fusion art" class="genre-card-art" loading="lazy">
+    </a>
+
+    <a href="{% url 'search' %}?q=Desert+Blues" class="genre-card-link bg-vibe-desert">
+      <div class="genre-name">Desert Blues</div>
+      <img src="https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?w=150&auto=format&fit=crop&q=80" alt="Desert Blues art" class="genre-card-art" loading="lazy">
+    </a>
+
+    <a href="{% url 'search' %}?q=Top+Charts" class="genre-card-link bg-vibe-charts">
+      <div class="genre-name">Global Charts</div>
+      <img src="https://images.unsplash.com/photo-1465847899084-d164df4dedc6?w=150&auto=format&fit=crop&q=80" alt="Global Charts art" class="genre-card-art" loading="lazy">
+    </a>
+
+    <a href="{% url 'search' %}?q=Party" class="genre-card-link bg-vibe-party">
+      <div class="genre-name">Sunset Vibes</div>
+      <img src="https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=150&auto=format&fit=crop&q=80" alt="Party art" class="genre-card-art" loading="lazy">
+    </a>
+  </div>
+</section>
+{% endblock %}
