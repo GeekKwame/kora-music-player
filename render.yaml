@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: kora-music-player
+    runtime: python
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn music.wsgi:application"
+    plan: free
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.0
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: "False"
+      - key: DATABASE_URL
+        sync: false

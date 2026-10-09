@@ -12,15 +12,15 @@ A music player and streaming web application built with Django.
 - `music/`: Django core project settings and routing
 - `music_app/`: Main Django app handling views and models
 - `templates/`: HTML templates for UI views
-- `frontend/`: CSS styles and static assets
+- `static/`: CSS styles, branding assets, and favicons
 
 ## Getting Started
 
 ### Prerequisites
 - Python 3.10+
-- virtualenv / venv
+- Docker & Docker Compose (for local PostgreSQL)
 
-### Setup
+### Local Setup
 1. Create and activate a virtual environment:
    ```bash
    python -m venv .venv
@@ -35,13 +35,29 @@ A music player and streaming web application built with Django.
    pip install -r requirements.txt
    ```
 
-3. Run database migrations:
+3. Start local PostgreSQL via Docker:
+   ```bash
+   docker compose up -d
+   ```
+
+4. Run database migrations:
    ```bash
    python manage.py migrate
    ```
 
-4. Start the development server:
+5. Start the development server:
    ```bash
    python manage.py runserver
    ```
    Open [http://127.0.0.1:8000/](http://127.0.0.1:8000/) in your browser.
+
+## Free Deployment (Render + Neon)
+1. **Database:** Create a free serverless PostgreSQL database at [Neon.tech](https://neon.tech) and copy your connection string.
+2. **Web Service:** Create a new Web Service on [Render.com](https://render.com) connected to this GitHub repo.
+3. **Build & Start Commands:**
+   - **Build Command:** `./build.sh`
+   - **Start Command:** `gunicorn music.wsgi:application`
+4. **Environment Variables on Render:**
+   - `DATABASE_URL`: Your Neon Postgres connection string
+   - `DEBUG`: `False`
+   - `SECRET_KEY`: A secure random secret key
