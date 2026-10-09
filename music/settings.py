@@ -13,7 +13,11 @@ https://docs.djangoproject.com/en/6.1/ref/settings/
 from pathlib import Path
 import os
 from dotenv import load_dotenv
-import dj_database_url
+
+try:
+    import dj_database_url
+except ImportError:
+    dj_database_url = None
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -110,9 +114,23 @@ WSGI_APPLICATION = 'music.wsgi.application'
 
 DATABASE_URL = os.getenv('DATABASE_URL')
 if DATABASE_URL:
-    DATABASES = {
-        'default': dj_database_url.parse(DATABASE_URL, conn_max_age=600)
-    }
+    if dj_database_url:
+        DATABASES = {
+            'default': dj_database_url.parse(DATABASE_URL, conn_max_age=600)
+        }
+    else:
+        import urllib.parse
+        url = urllib.parse.urlparse(DATABASE_URL)
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.postgresql',
+                'NAME': url.path.lstrip('/'),
+                'USER': url.username or '',
+                'PASSWORD': url.password or '',
+                'HOST': url.hostname or 'localhost',
+                'PORT': str(url.port or 5432),
+            }
+        }
 elif os.getenv('RENDER') and not os.getenv('DB_HOST'):
     # Resilient fallback on Render when no managed PostgreSQL service is attached
     DATABASES = {
@@ -141,6 +159,12 @@ else:
                 'PORT': os.getenv('DB_PORT', '5435'),
             }
         }
+
+
+# Default primary key field type
+# https://docs.djangoproject.com/en/6.1/ref/settings/#default-auto-field
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 # Password validation
