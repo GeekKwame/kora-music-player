@@ -1,30 +1,52 @@
 # Configuration
 
-Copy `.env.example` to `.env` for local development. `.env` is ignored by Git and must never be deployed or committed. The settings module reads it from the repository root.
+Kora is configured via environment variables. Copy `.env.example` to `.env` for local development. `.env` is ignored by Git and must never be committed to source control.
 
-| Variable | Required | Default / behavior |
-| --- | --- | --- |
-| `SECRET_KEY` | Yes in production | Django has a development fallback; production must provide a unique, secret random value. |
-| `DEBUG` | Yes in production | Defaults to `True`; set exactly `False`, `0`, or another false value for production. |
-| `ALLOWED_HOSTS` | Yes in production | Space-separated hostnames. Defaults include local hosts and `.onrender.com`. |
-| `DATABASE_URL` | Recommended in production | A PostgreSQL connection URL. When present, it overrides all `DB_*` variables. |
-| `DB_NAME` | Local only | `kora_db`. |
-| `DB_USER` | Local only | `kora_user`. |
-| `DB_PASSWORD` | Local only | Local Compose default is `kora_password123`; replace it outside disposable local use. |
-| `DB_HOST` | Local only | `localhost`. |
-| `DB_PORT` | Local only | `5435`. |
-| `RAPIDAPI_KEY` | Yes for catalogue data | RapidAPI credential sent as `x-rapidapi-key`. Without it, discovery requests fail gracefully and return empty results. |
-| `RAPIDAPI_HOST` | No | `spotify23.p.rapidapi.com`; sent as `x-rapidapi-host` and used to build the API URL. |
-| `RENDER_EXTERNAL_HOSTNAME` | Render-managed | Added to `ALLOWED_HOSTS` when supplied by Render. |
+---
 
-## Production values
+## Environment Variable Reference
 
-- Generate and store `SECRET_KEY` in the hosting provider’s encrypted environment-variable store.
-- Use a managed PostgreSQL `DATABASE_URL` with TLS as required by the provider.
-- Set `DEBUG=False` and list only controlled domains in `ALLOWED_HOSTS`.
-- Provision a RapidAPI subscription with capacity for application traffic. API keys are secrets and should be rotated immediately if exposed.
+| Variable | Required in Production | Default Value | Description |
+| --- | --- | --- | --- |
+| `SECRET_KEY` | **Yes** | Insecure development string | Cryptographic secret for session signing and CSRF tokens. Must be long and random in production. |
+| `DEBUG` | **Yes** | `True` | Set to `False` in production. Controls detailed stack traces and production security checks. |
+| `ALLOWED_HOSTS` | **Yes** | `localhost 127.0.0.1 [::1] testserver .onrender.com` | Space-separated list of allowed hostnames/domains. |
+| `RENDER_EXTERNAL_HOSTNAME` | Managed by Render | Empty | Automatically appended to `ALLOWED_HOSTS` and `CSRF_TRUSTED_ORIGINS` on Render. |
+| `CSRF_TRUSTED_ORIGINS` | No | `https://*.onrender.com http://localhost:8000 http://127.0.0.1:8000` | Space-separated list of trusted origins for HTTPS POST requests. |
+| `DATABASE_URL` | Recommended | Empty | Managed PostgreSQL connection string (`postgresql://user:pass@host:port/db`). Overrides all individual `DB_*` settings. |
+| `DB_ENGINE` | No | `postgresql` | Set to `sqlite` to force SQLite storage locally or in lightweight containers. |
+| `DB_NAME` | Local Compose only | `kora_db` | PostgreSQL database name. |
+| `DB_USER` | Local Compose only | `kora_user` | PostgreSQL username. |
+| `DB_PASSWORD` | Local Compose only | `kora_password123` | PostgreSQL password. |
+| `DB_HOST` | Local Compose only | `localhost` | PostgreSQL host. |
+| `DB_PORT` | Local Compose only | `5435` | PostgreSQL port (matches `docker-compose.yml`). |
+| `RAPIDAPI_KEY` | Recommended | Empty | RapidAPI key for the Spotify23 catalogue API. Sent as `x-rapidapi-key`. |
+| `RAPIDAPI_HOST` | No | `spotify23.p.rapidapi.com` | RapidAPI host for the Spotify23 API. |
+| `SECURE_SSL_REDIRECT` | No | `True` (when `DEBUG=False`) | Enforces HTTPS redirection in production environments. |
+| `SECURE_HSTS_SECONDS` | No | `31536000` (1 year) | HTTP Strict Transport Security duration applied when `DEBUG=False`. |
+| `EMAIL_BACKEND` | No | `django.core.mail.backends.console.EmailBackend` in dev, `smtp.EmailBackend` in prod | Mailer backend for Django 6 `MAILERS` setting. |
 
-## Database precedence
+---
 
-When `DATABASE_URL` is configured, `dj-database-url` creates the Django connection with a 600-second connection lifetime. Otherwise Django connects using individual `DB_*` settings, matching the local Docker Compose service.
+## Database Precedence & Fallback Logic
 
+Django configures the database connection in `music/settings.py` following this hierarchy:
+
+1. **`DATABASE_URL`**: If set, parsed by `dj-database-url` with connection pooling (`conn_max_age=600`).
+2. **Render Resilient Fallback**: If running on Render (`RENDER=true`) and no database host is configured, Kora defaults automatically to SQLite (`db.sqlite3`) to prevent `500 Internal Server Error` connection crashes.
+3. **`DB_ENGINE=sqlite`**: Forces SQLite storage.
+4. **Local PostgreSQL**: Connects to `DB_HOST:DB_PORT` using individual credentials matching Docker Compose.
+
+---
+
+## Production Setup Recommendations
+
+1. **Secret Key**: Generate a 64-character random key:
+   ```bash
+   python -c "import secrets; print(secrets.token_urlsafe(50))"
+   ```
+2. **Render Environment Configuration**:
+   - Set `DEBUG=False`.
+   - Set `SECRET_KEY=<your-secret>`.
+   - Set `RAPIDAPI_KEY=<your-rapidapi-key>`.
+   - Set `DATABASE_URL` from your provisioned PostgreSQL instance.
