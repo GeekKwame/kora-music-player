@@ -2,10 +2,49 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
+from .spotify_service import search_spotify, get_artist_overview
 
 # Create your views here.
 def home(request):
-    return render(request, 'index.html')
+    # Fetch featured music and artists (cached)
+    spotify_data = search_spotify('Afrobeats', limit=8)
+    context = {
+        'featured_artists': spotify_data.get('artists', []),
+        'featured_tracks': spotify_data.get('tracks', []),
+    }
+    return render(request, 'index.html', context)
+
+
+def search(request):
+    query = request.GET.get('q', '').strip()
+    artists = []
+    tracks = []
+
+    if query:
+        results = search_spotify(query, limit=15)
+        artists = results.get('artists', [])
+        tracks = results.get('tracks', [])
+
+    context = {
+        'query': query,
+        'artists': artists,
+        'tracks': tracks,
+    }
+    return render(request, 'search.html', context)
+
+
+def profile(request, artist_id):
+    artist = get_artist_overview(artist_id)
+    if not artist:
+        # Fallback to general search if direct overview fails
+        search_res = search_spotify(artist_id, limit=1)
+        if search_res.get('artists'):
+            artist = get_artist_overview(search_res['artists'][0]['id'])
+
+    context = {
+        'artist': artist,
+    }
+    return render(request, 'profile.html', context)
 
 
 def signup(request):
@@ -30,7 +69,6 @@ def signup(request):
         elif email and User.objects.filter(email=email).exists():
             messages.error(request, 'An account with this email already exists.')
         else:
-            # Create user and log them in
             user = User.objects.create_user(username=username, email=email, password=password)
             user.save()
             auth_login(request, user)
