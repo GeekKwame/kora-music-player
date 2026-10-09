@@ -14,25 +14,39 @@
 <body class="bg-black h-screen flex flex-col items-center justify-center">
   <div class="w-full max-w-xs px-6">
     <div class="mb-8 flex flex-col items-center">
-      <img src="{% static 'kora_logo.png' %}" alt="Kora Logo" class="w-28 h-28 object-contain">
+      <a href="{% url 'home' %}">
+        <img src="{% static 'kora_logo.png' %}" alt="Kora Logo" class="w-28 h-28 object-contain">
+      </a>
       <h1 class="text-3xl text-white font-bold mt-2">Kora</h1>
     </div>
-    <form class="bg-black">
+
+    {% if messages %}
       <div class="mb-4">
-        <input class="bg-gray-800 text-white border border-gray-600 rounded py-2 px-4 block w-full appearance-none leading-normal" type="text" placeholder="Username">
+        {% for message in messages %}
+          <div class="p-2 mb-2 text-xs rounded text-center {% if message.tags == 'error' %}bg-red-900 text-red-200 border border-red-700{% elif message.tags == 'success' %}bg-green-900 text-green-200 border border-green-700{% else %}bg-yellow-900 text-yellow-200 border border-yellow-700{% endif %}">
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <form action="{% url 'signup' %}" method="post" class="bg-black">
+      {% csrf_token %}
+      <div class="mb-4">
+        <input class="bg-gray-800 text-white border border-gray-600 rounded py-2 px-4 block w-full appearance-none leading-normal focus:outline-none focus:border-yellow-500" type="text" name="username" placeholder="Username" required>
       </div>
       <div class="mb-4">
-        <input class="bg-gray-800 text-white border border-gray-600 rounded py-2 px-4 block w-full appearance-none leading-normal" type="email" placeholder="Email">
+        <input class="bg-gray-800 text-white border border-gray-600 rounded py-2 px-4 block w-full appearance-none leading-normal focus:outline-none focus:border-yellow-500" type="email" name="email" placeholder="Email">
       </div>
       <div class="mb-6">
-        <input class="bg-gray-800 text-white border border-gray-600 rounded py-2 px-4 block w-full appearance-none leading-normal" type="password" placeholder="Password">
+        <input class="bg-gray-800 text-white border border-gray-600 rounded py-2 px-4 block w-full appearance-none leading-normal focus:outline-none focus:border-yellow-500" type="password" name="password" placeholder="Password" required>
       </div>
       <div class="mb-6">
-        <input class="bg-gray-800 text-white border border-gray-600 rounded py-2 px-4 block w-full appearance-none leading-normal" type="password" placeholder="Repeat Password">
+        <input class="bg-gray-800 text-white border border-gray-600 rounded py-2 px-4 block w-full appearance-none leading-normal focus:outline-none focus:border-yellow-500" type="password" name="repeat_password" placeholder="Repeat Password" required>
       </div>
-      <button class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded w-full mb-4">Register</button>
+      <button type="submit" class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded w-full mb-4 transition duration-200">Register</button>
       <p class="text-center text-gray-400 text-xs">
-        Already have an account?<a href="#" class="text-yellow-500 hover:underline"> Sign in</a>
+        Already have an account?<a href="{% url 'login' %}" class="text-yellow-500 hover:underline"> Sign in</a>
       </p>
     </form>
     <p class="text-center text-gray-500 text-xs mt-4">

@@ -20,15 +20,27 @@
 
         <!-- Welcome User -->
         <div class="sidebar-section">
-            <span style="margin-left: 14px;" class="sidebar-link-icon">👤</span>
-            <b>Welcome, user</b>
-            <br>
-            <br>
-
-            <a href="#">
-                <span class="sidebar-link-icon">↪️</span>
-                <b>Logout</b>
-            </a>
+            {% if request.user.is_authenticated %}
+                <span style="margin-left: 14px;" class="sidebar-link-icon">👤</span>
+                <b>Welcome, {{ request.user.username }}</b>
+                <br>
+                <br>
+                <a href="{% url 'logout' %}">
+                    <span class="sidebar-link-icon">↪️</span>
+                    <b>Logout</b>
+                </a>
+            {% else %}
+                <span style="margin-left: 14px;" class="sidebar-link-icon">👤</span>
+                <b>Welcome, Guest</b>
+                <br>
+                <br>
+                <a href="{% url 'login' %}" style="color: #e5a93b; text-decoration: none; margin-right: 8px;">
+                    <b>Sign In</b>
+                </a> | 
+                <a href="{% url 'signup' %}" style="color: #bbb; text-decoration: none; margin-left: 8px;">
+                    <b>Register</b>
+                </a>
+            {% endif %}
         </div>
 
         <!-- Top section of the sidebar -->
@@ -67,6 +79,15 @@
     </div>
 
     <div style="margin-left:240px; padding:20px;">
+        {% if messages %}
+            <div style="margin-bottom: 20px;">
+                {% for message in messages %}
+                    <div style="padding: 10px 15px; border-radius: 6px; font-size: 14px; margin-bottom: 10px; {% if message.tags == 'error' %}background-color: #5c1d1d; color: #ffbaba;{% elif message.tags == 'success' %}background-color: #1b4d2e; color: #c3e6cb;{% else %}background-color: #4a3e1b; color: #ffeeba;{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
         <header class="header-container">
             <div class="search-bar" style="width: 390px;">
                 <input type="search" placeholder="What do you want to listen to?" aria-label="Search">
